@@ -202,6 +202,12 @@ folders fresh on each request too). Rebuilding the image
 (`docker compose up -d --build`) is only needed after changing the
 application code itself.
 
+`.env` and the contents of `./data/` are git-ignored: they are the
+per-host settings and live site data of a deployment, so `git pull` on
+the server never overwrites them. The top-level `config/`, `content/`,
+`galleries/` and `photos/` folders stay in git as the sample seed data
+baked into the image.
+
 ## Notes
 
 - Sample images are placeholder SVGs so the site runs out of the box;
