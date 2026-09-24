@@ -1,0 +1,51 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: photographer-site:latest
+    restart: unless-stopped
+    ports:
+      # Bound to localhost only - reachable for debugging directly on
+      # the host (e.g. over an SSH tunnel: `ssh -L 3000:localhost:3000
+      # you@vps`), but not from the internet. Public traffic comes in
+      # exclusively through the reverse-proxy stack (../reverse-proxy),
+      # over the "edge" network below - that's what enforces HTTPS-only.
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"
+    networks:
+      - edge
+    environment:
+      PORT: 3000
+      # Picked up by nginx-proxy (on the "edge" network) to auto-route
+      # https://photo.laurentml.fr here and get it a Let's Encrypt
+      # certificate - see ../reverse-proxy/docker-compose.yml.
+      VIRTUAL_HOST: photo.laurentml.fr
+      VIRTUAL_PORT: "3000"
+      LETSENCRYPT_HOST: photo.laurentml.fr
+      # Ownership applied inside the container to whatever the four
+      # volumes below resolve to on the host (see docker-entrypoint.sh).
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      # Optional: pin the CAPTCHA signing secret / proof-of-work
+      # difficulty instead of the defaults (random secret generated on
+      # every start, 18-bit PoW). See .env.example for details.
+      CAPTCHA_SECRET: ${CAPTCHA_SECRET:-}
+      CAPTCHA_POW_BITS: ${CAPTCHA_POW_BITS:-18}
+    volumes:
+      # External volumes: real directories on the host server, so a
+      # photographer can edit YAML / drop in photos without touching
+      # the container or image at all. Defaults point at ./data/* next
+      # to this compose file (handy for a first run); override the
+      # *_DIR variables in a .env file to point at real paths on the
+      # host, e.g. /srv/photographer-site/config.
+      - ${CONFIG_DIR:-./data/config}:/app/config
+      - ${CONTENT_DIR:-./data/content}:/app/content
+      - ${GALLERIES_DIR:-./data/galleries}:/app/galleries
+      - ${PHOTOS_DIR:-./data/photos}:/app/photos
+
+networks:
+  # Shared with the reverse-proxy stack. Created once, outside of
+  # either compose file:  docker network create edge
+  edge:
+    name: edge
+    external: true

@@ -1,0 +1,30 @@
+<%
+// Expects a local variable `gallery` = { title, description, mode, interval, images: [{src, alt}] }
+// and an optional `idPrefix` to allow multiple slideshows on one page.
+const prefix = typeof idPrefix !== 'undefined' ? idPrefix : 'slideshow';
+%>
+<div class="gallery gallery--slideshow" data-component="slideshow" data-interval="<%= gallery.interval %>" id="<%= prefix %>">
+  <% if (gallery.images.length === 0) { %>
+    <p class="gallery-empty">No images found in this gallery yet.</p>
+  <% } else { %>
+    <div class="slideshow-viewport">
+      <% gallery.images.forEach(function(img, i) { %>
+        <figure class="slide <%= i === 0 ? 'is-active' : '' %>">
+          <button type="button" class="slide-trigger" data-index="<%= i %>" aria-label="Enlarge photo">
+            <img src="<%= img.src %>" alt="<%= img.alt %>" loading="<%= i === 0 ? 'eager' : 'lazy' %>" />
+          </button>
+        </figure>
+      <% }); %>
+    </div>
+    <% if (gallery.images.length > 1) { %>
+      <button class="slide-nav slide-prev" type="button" aria-label="Previous photo">&#8249;</button>
+      <button class="slide-nav slide-next" type="button" aria-label="Next photo">&#8250;</button>
+      <div class="slide-dots">
+        <% gallery.images.forEach(function(img, i) { %>
+          <button class="slide-dot <%= i === 0 ? 'is-active' : '' %>" type="button" data-index="<%= i %>" aria-label="Go to photo <%= i + 1 %>"></button>
+        <% }); %>
+      </div>
+    <% } %>
+    <script type="application/json" class="gallery-data"><%- JSON.stringify(gallery.images).replace(/</g, '\\u003c') %></script>
+  <% } %>
+</div>

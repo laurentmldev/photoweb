@@ -1,0 +1,20 @@
+<%
+// Reusable "photo gallery" component.
+// Renders a title/description header plus the gallery body, in whichever
+// display mode ("slideshow" or "thumbnails") the gallery's YAML config set.
+// gallery.maxWidth / gallery.maxHeight (px, optional) cap the displayed
+// image size and are passed down as CSS custom properties.
+const sizeStyle =
+  (gallery.maxWidth ? `--gallery-max-width: ${gallery.maxWidth}px;` : "") +
+  (gallery.maxHeight ? ` --gallery-max-height: ${gallery.maxHeight}px;` : "");
+%>
+<section class="gallery-block" style="<%= sizeStyle %>">
+  <% if (gallery.title) { %><h2 class="gallery-title"><%= gallery.title %></h2><% } %>
+  <% if (gallery.description) { %><p class="gallery-description"><%= gallery.description %></p><% } %>
+
+  <% if (gallery.mode === 'slideshow') { %>
+    <%- include('gallery-slideshow', { gallery: gallery, idPrefix: typeof idPrefix !== 'undefined' ? idPrefix : 'slideshow' }) %>
+  <% } else { %>
+    <%- include('gallery-thumbnails', { gallery: gallery, idPrefix: typeof idPrefix !== 'undefined' ? idPrefix : 'thumbnails' }) %>
+  <% } %>
+</section>

@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------
+# Global site configuration.
+# This file is (re)loaded dynamically on every request, so changes here
+# (or made through an admin tool later on) are picked up without
+# restarting the server.
+# -----------------------------------------------------------------------
+
+site:
+  title: "Elena Moreau Photography"
+  tagline: "Fine-art & documentary photography"
+  logoText: "E. Moreau"
+  language: "en"
+
+theme:
+  # Charte graphique (visual identity)
+  primaryColor: "#161513"        # main text / dark backgrounds
+  secondaryColor: "#f5f3ef"      # light background
+  accentColor: "#b08a4e"         # gold accent used for links / highlights
+  mutedColor: "#7a7670"          # secondary text
+  borderColor: "#e2ddd3"
+  headerBackgroundColor: "#f5f3ef"  # background of the top navigation bar
+  footerBackgroundColor: "#f5f3ef"  # background of the footer
+
+  headingFont: "'Cormorant Garamond', Georgia, serif"
+  bodyFont: "'Inter', -apple-system, Helvetica, Arial, sans-serif"
+
+  # Optional Google Fonts import (leave empty to disable)
+  googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&display=swap"
+
+navigation:
+  - label: "Home"
+    path: "/"
+  - label: "Projects"
+    path: "/projects"
+  - label: "Contact"
+    path: "/contact"
+
+footer:
+  copyrightName: "Elena Moreau"
+  socials:
+    - label: "Instagram"
+      url: "https://instagram.com/example"
+    - label: "Behance"
+      url: "https://behance.net/example"

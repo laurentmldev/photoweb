@@ -1,0 +1,18 @@
+<%
+// Expects a local variable `gallery` = { title, description, images: [{src, alt}] }
+const prefix = typeof idPrefix !== 'undefined' ? idPrefix : 'thumbnails';
+%>
+<div class="gallery gallery--thumbnails" data-component="thumbnails" id="<%= prefix %>">
+  <% if (gallery.images.length === 0) { %>
+    <p class="gallery-empty">No images found in this gallery yet.</p>
+  <% } else { %>
+    <div class="thumbnail-grid">
+      <% gallery.images.forEach(function(img, i) { %>
+        <button type="button" class="thumbnail" data-index="<%= i %>" aria-label="Enlarge photo">
+          <img src="<%= img.src %>" alt="<%= img.alt %>" loading="lazy" />
+        </button>
+      <% }); %>
+    </div>
+    <script type="application/json" class="gallery-data"><%- JSON.stringify(gallery.images).replace(/</g, '\\u003c') %></script>
+  <% } %>
+</div>

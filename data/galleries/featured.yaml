@@ -1,0 +1,14 @@
+# Reusable "photo gallery" component configuration.
+# directory:  path (relative to the photos/ root) containing the images
+# mode:       "slideshow" or "thumbnails"
+# title/description: shown above the gallery
+# interval:   slideshow auto-rotate delay, in seconds (default 3)
+# maxWidth/maxHeight: optional, caps the displayed image size in px
+
+directory: "featured"
+mode: "slideshow"
+title: "Featured Work"
+description: "A rotating selection of recent favorites, spanning weddings, portraits and travel."
+interval: 4
+maxWidth: 1100
+maxHeight: 300

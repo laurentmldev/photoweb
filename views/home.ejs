@@ -1,0 +1,10 @@
+<%- include('partials/layout-top') %>
+
+<section class="hero">
+  <h1><%= page.heading %></h1>
+  <p class="hero-intro"><%= page.intro %></p>
+</section>
+
+<%- include('partials/gallery', { gallery: gallery, idPrefix: 'home-slideshow' }) %>
+
+<%- include('partials/layout-bottom') %>

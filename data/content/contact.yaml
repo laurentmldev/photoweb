@@ -1,0 +1,10 @@
+title: "Contact"
+intro: "Available for weddings, portrait sessions and editorial assignments worldwide. Let's talk about your project."
+email: "hello@elenamoreau.example"
+phone: "+33 6 12 34 56 78"
+location: "Paris, France"
+socials:
+  - label: "Instagram"
+    url: "https://instagram.com/example"
+  - label: "Behance"
+    url: "https://behance.net/example"

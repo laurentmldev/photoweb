@@ -1,0 +1,9 @@
+title: "Projects"
+intro: "A selection of personal and client projects. Click a gallery to explore it in full."
+galleries:
+  - slug: "weddings"
+    config: "galleries/weddings.yaml"
+  - slug: "portraits"
+    config: "galleries/portraits.yaml"
+  - slug: "travel"
+    config: "galleries/travel.yaml"

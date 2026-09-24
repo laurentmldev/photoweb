@@ -1,0 +1,6 @@
+directory: "weddings"
+mode: "slideshow"
+title: "Weddings"
+description: "Candid, light-driven coverage of weddings across France and Italy."
+interval: 3
+maxWidth: 1200

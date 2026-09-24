@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="<%= siteConfig.site.language %>">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof page !== 'undefined' && page.title ? page.title + ' — ' + siteConfig.site.title : siteConfig.site.title %></title>
+  <% if (siteConfig.theme.googleFontsUrl) { %>
+    <link rel="stylesheet" href="<%= siteConfig.theme.googleFontsUrl %>" />
+  <% } %>
+  <link rel="stylesheet" href="/public/css/style.css" />
+  <style>
+    :root {
+      --color-primary: <%= siteConfig.theme.primaryColor %>;
+      --color-secondary: <%= siteConfig.theme.secondaryColor %>;
+      --color-accent: <%= siteConfig.theme.accentColor %>;
+      --color-muted: <%= siteConfig.theme.mutedColor %>;
+      --color-border: <%= siteConfig.theme.borderColor %>;
+      --color-header-bg: <%= siteConfig.theme.headerBackgroundColor %>;
+      --color-footer-bg: <%= siteConfig.theme.footerBackgroundColor %>;
+      --font-heading: <%= siteConfig.theme.headingFont %>;
+      --font-body: <%= siteConfig.theme.bodyFont %>;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/"><%= siteConfig.site.logoText %></a>
+    <nav class="main-nav">
+      <% (siteConfig.navigation || []).forEach(function(item) { %>
+        <a href="<%= item.path %>" class="<%= currentPath === item.path ? 'active' : '' %>"><%= item.label %></a>
+      <% }); %>
+    </nav>
+  </header>
+  <main>
