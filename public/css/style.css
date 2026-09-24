@@ -119,7 +119,9 @@ main {
 .slideshow-viewport .slide img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* Fit the whole photo inside the box (bounded by maxWidth/maxHeight):
+     its longer side touches the box edge, nothing is cropped. */
+  object-fit: contain;
 }
 .slide-nav {
   position: absolute;
@@ -173,7 +175,7 @@ main {
 .thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.35s ease;
 }
 .thumbnail:hover img { transform: scale(1.05); }

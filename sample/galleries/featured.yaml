@@ -3,7 +3,8 @@
 # mode:       "slideshow" or "thumbnails"
 # title/description: shown above the gallery
 # interval:   slideshow auto-rotate delay, in seconds (default 3)
-# maxWidth/maxHeight: optional, caps the displayed image size in px
+# maxWidth/maxHeight: optional, caps the displayed image size in px; photos are
+#             scaled to fit (longer side touches the limit), never cropped
 
 directory: "featured"
 mode: "slideshow"
