@@ -30,20 +30,17 @@ COPY lib ./lib
 COPY public ./public
 COPY views ./views
 
-# Sample/starter config, content and images, staged under /app/.seed.
-# These are NOT the live paths the app reads from - config/, content/,
-# galleries/ and photos/ are external volumes (see docker-compose.yml)
-# and are expected to be empty the first time the container runs on a
-# fresh host. The entrypoint copies this seed data into each of those
-# volumes on first run only, so `docker compose up` shows a working
-# site immediately; any volume the host operator has already populated
-# is left untouched.
-COPY config ./.seed/config
-COPY content ./.seed/content
-COPY galleries ./.seed/galleries
-COPY photos ./.seed/photos
+# Sample/starter config, content and images (sample/), staged under
+# /app/sample. These are NOT the live paths the app reads from: the app
+# reads /app/data/{config,content,galleries,photos}, which are external
+# volumes (see docker-compose.yml) and are expected to be empty the
+# first time the container runs on a fresh host. The entrypoint copies
+# the sample into each of those volumes on first run only, so
+# `docker compose up` shows a working site immediately; any volume the
+# host operator has already populated is left untouched.
+COPY sample ./sample
 
-RUN mkdir -p /app/config /app/content /app/galleries /app/photos
+RUN mkdir -p /app/data/config /app/data/content /app/data/galleries /app/data/photos
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

@@ -38,10 +38,10 @@ services:
       # to this compose file (handy for a first run); override the
       # *_DIR variables in a .env file to point at real paths on the
       # host, e.g. /srv/photographer-site/config.
-      - ${CONFIG_DIR:-./data/config}:/app/config
-      - ${CONTENT_DIR:-./data/content}:/app/content
-      - ${GALLERIES_DIR:-./data/galleries}:/app/galleries
-      - ${PHOTOS_DIR:-./data/photos}:/app/photos
+      - ${CONFIG_DIR:-./data/config}:/app/data/config
+      - ${CONTENT_DIR:-./data/content}:/app/data/content
+      - ${GALLERIES_DIR:-./data/galleries}:/app/data/galleries
+      - ${PHOTOS_DIR:-./data/photos}:/app/data/photos
 
 networks:
   # Shared with the reverse-proxy stack. Created once, outside of

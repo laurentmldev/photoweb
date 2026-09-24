@@ -17,30 +17,37 @@ dropping images into folders.
 
 ```bash
 npm install
+cp -r sample/. data/     # first time only: start from the sample data
 npm start
 # -> http://localhost:3000
 ```
 
 `npm run dev` restarts automatically on file changes (Node's built-in `--watch`).
 
+The app reads all site data (`config/`, `content/`, `galleries/`,
+`photos/`) from `./data/`. Set `DATA_DIR` to read from somewhere else,
+e.g. `DATA_DIR=sample npm start` to run straight off the sample data.
+
 ## Project structure
 
 ```
-config/
-  site.yaml            # global config: title, colors, fonts, nav, footer
-content/
-  home.yaml            # home page text + which gallery to show
-  projects.yaml        # projects page text + list of galleries
-  contact.yaml         # contact page text
-galleries/
-  featured.yaml        # reusable gallery configs (one per gallery)
-  weddings.yaml
-  portraits.yaml
-  travel.yaml
-photos/
-  featured/ weddings/ portraits/ travel/   # actual image files
+sample/                # sample site data, tracked in git (copied into data/ on first run)
+data/                  # live site data, git-ignored - same layout as sample/:
+  config/
+    site.yaml            # global config: title, colors, fonts, nav, footer
+  content/
+    home.yaml            # home page text + which gallery to show
+    projects.yaml        # projects page text + list of galleries
+    contact.yaml         # contact page text
+  galleries/
+    featured.yaml        # reusable gallery configs (one per gallery)
+    weddings.yaml
+    portraits.yaml
+    travel.yaml
+  photos/
+    featured/ weddings/ portraits/ travel/   # actual image files
 lib/
-  config.js            # loads config/site.yaml + generic YAML content loader
+  config.js            # loads data/config/site.yaml + generic YAML content loader
   gallery.js            # the reusable "photo gallery" component logic
 views/
   partials/gallery.ejs           # gallery component entry point
@@ -178,11 +185,12 @@ What this sets up:
 
 - **`Dockerfile`** — multi-stage build (Node 20 Alpine). The app code
   (`server.js`, `lib/`, `public/`, `views/`) is baked into the image;
-  `config/`, `content/`, `galleries/` and `photos/` are **not** — those
-  are the four external volumes.
+  the sample data (`sample/`) is copied in at `/app/sample`; the live
+  `config/`, `content/`, `galleries/` and `photos/` under `/app/data/`
+  are **not** in the image — those are the four external volumes.
 - **`docker-compose.yml`** — builds the image and bind-mounts
-  `CONFIG_DIR` → `/app/config`, `CONTENT_DIR` → `/app/content`,
-  `GALLERIES_DIR` → `/app/galleries`, `PHOTOS_DIR` → `/app/photos` (all
+  `CONFIG_DIR` → `/app/data/config`, `CONTENT_DIR` → `/app/data/content`,
+  `GALLERIES_DIR` → `/app/data/galleries`, `PHOTOS_DIR` → `/app/data/photos` (all
   overridable via `.env`, defaulting to `./data/*`).
 - **`docker-entrypoint.sh`** — on first run, seeds any of those four
   volumes that's completely empty with the sample config/content/photos
@@ -204,12 +212,12 @@ application code itself.
 
 `.env` and the contents of `./data/` are git-ignored: they are the
 per-host settings and live site data of a deployment, so `git pull` on
-the server never overwrites them. The top-level `config/`, `content/`,
-`galleries/` and `photos/` folders stay in git as the sample seed data
-baked into the image.
+the server never overwrites them. The `sample/` folder stays in git as
+the starting data baked into the image: edit it only to change what a
+brand-new install starts with.
 
 ## Notes
 
 - Sample images are placeholder SVGs so the site runs out of the box;
-  replace them with real JPG/PNG/WebP files in `photos/`.
+  replace them with real JPG/PNG/WebP files in `data/photos/`.
 - Supported image extensions: `.jpg .jpeg .png .webp .gif .svg`.
