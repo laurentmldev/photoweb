@@ -30,14 +30,14 @@ fi
 # directory around in git or in a zip archive - doesn't itself count as
 # real content and block seeding.
 for dir in config content galleries photos; do
-  target="/app/$dir"
-  seed="/app/.seed/$dir"
+  target="/app/data/$dir"
+  seed="/app/sample/$dir"
   if [ -d "$target" ] && [ -z "$(find "$target" -mindepth 1 -not -name '.*' -print -quit 2>/dev/null)" ]; then
-    echo "[entrypoint] /app/$dir has no real content yet - copying in the sample $dir/ as a starting point"
+    echo "[entrypoint] /app/data/$dir has no real content yet - copying in the sample $dir/ as a starting point"
     cp -r "$seed"/. "$target"/
   fi
 done
 
-chown -R "$APP_UID:$APP_GID" /app/config /app/content /app/galleries /app/photos
+chown -R "$APP_UID:$APP_GID" /app/data
 
 exec su-exec "$APP_UID:$APP_GID" "$@"
