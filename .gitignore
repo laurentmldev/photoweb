@@ -1,5 +1,23 @@
-config
-content
-data
-galleries
-photos
+# Dependencies / logs
+node_modules/
+npm-debug.log*
+
+# Local secrets & per-host settings (copy .env.example to .env)
+.env
+
+# Live site data used by docker-compose volumes (./data/* by default).
+# This is the deployed copy of config/, content/, galleries/ and photos/
+# that gets edited on the server, so it must never be committed.
+# Only the empty directory skeleton (.gitkeep) is kept in git.
+#
+# NOTE: the top-level config/, content/, galleries/ and photos/ folders
+# are NOT ignored: they are the sample "seed" data baked into the Docker
+# image (see Dockerfile) and must stay tracked for the build to work.
+/data/**
+!/data/*/
+!/data/*/.gitkeep
+
+# Archives / OS / editor clutter
+*.zip
+.DS_Store
+Thumbs.db
