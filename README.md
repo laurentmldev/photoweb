@@ -37,7 +37,7 @@ data/                  # live site data, git-ignored - same layout as sample/:
     site.yaml            # global config: title, colors, fonts, nav, footer
   content/
     home.yaml            # home page text + which gallery to show
-    projects.yaml        # projects page text + list of galleries
+    galleries.yaml       # galleries page text + list of galleries
     contact.yaml         # contact page text
   galleries/
     featured.yaml        # reusable gallery configs (one per gallery)
@@ -53,7 +53,7 @@ views/
   partials/gallery.ejs           # gallery component entry point
   partials/gallery-slideshow.ejs # slideshow rendering
   partials/gallery-thumbnails.ejs# thumbnail grid rendering
-  home.ejs / projects.ejs / gallery.ejs / contact.ejs
+  home.ejs / galleries.ejs / gallery.ejs / contact.ejs
 public/
   css/style.css        # theme, driven by CSS variables from site.yaml
   js/gallery.js         # slideshow behaviour (autoplay, arrows, dots)
@@ -88,11 +88,11 @@ renders either the slideshow or the thumbnail-grid partial depending on
 `mode` — so the exact same component powers:
 
 - the **home page** slideshow (`content/home.yaml` → `galleries/featured.yaml`)
-- each **project's** page at `/projects/:slug` (`galleries/weddings.yaml`, etc.)
+- each gallery's own page at `/galleries/:slug` (`galleries/weddings.yaml`, etc.)
 
 To add a new gallery: create `galleries/my-gallery.yaml`, drop images
 into `photos/my-gallery/`, and reference it from `content/home.yaml`
-or add an entry to `content/projects.yaml`.
+or add an entry to `content/galleries.yaml`.
 
 ### Auto-rotating slideshow
 
@@ -131,8 +131,8 @@ to `"<gallery title> - <file name>"`.
 | Route              | Content source                          | Description |
 |---------------------|------------------------------------------|--------------|
 | `/`                 | `content/home.yaml`                     | Hero text + one slideshow gallery |
-| `/projects`         | `content/projects.yaml`                 | Grid of galleries, one thumbnail preview each |
-| `/projects/:slug`   | entry in `content/projects.yaml`        | Full gallery (slideshow or thumbnails, per its own YAML) |
+| `/galleries`        | `content/galleries.yaml`                | Grid of galleries, one thumbnail preview each (older sites: `content/projects.yaml` is still read if `galleries.yaml` is absent; old `/projects...` URLs redirect here) |
+| `/galleries/:slug`  | entry in `content/galleries.yaml`       | Full gallery (slideshow or thumbnails, per its own YAML) |
 | `/contact`          | `content/contact.yaml`                  | Contact details & social links |
 | `/<name>`           | `content/<name>.yaml` (with a `gallery:` key) | Extra top-level page: hero text + one gallery. E.g. `content/weddings.yaml` → `/weddings`; add it to `navigation` in `config/site.yaml` to show it as a tab |
 | `/your-photos`      | any `galleries/*.yaml` with a `password` | Customer login (gallery name + password) for private galleries |
@@ -149,11 +149,11 @@ mode: "thumbnails"
 title: "Anna & Marc - 14 June"
 ```
 
-- It never appears on the public site: not in the Projects list (even if
-  `content/projects.yaml` references it), and `/projects/<slug>` returns 404.
+- It never appears on the public site: not in the Galleries list (even if
+  `content/galleries.yaml` references it), and `/galleries/<slug>` returns 404.
 - Its photos are **not** served from the public `/photos/...` URLs, only
   through `/your-photos/<directory>/photos/...` to a visitor who logged in.
-- Customers click **Your Photos** on the Projects page, type the directory
+- Customers click **Your Photos** on the Galleries page, type the directory
   name (case-insensitive) and the password. Access is kept for 12 hours by
   a signed cookie; changing the password in the YAML file revokes it
   immediately. The form also has the same human check as the contact page

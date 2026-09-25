@@ -59,32 +59,39 @@ app.get("/", async (req, res, next) => {
 });
 
 // ---------------------------------------------------------------------
-// Projects page: list of galleries, one thumbnail preview per gallery
+// Galleries page: list of galleries, one thumbnail preview per gallery.
+// Read from content/galleries.yaml, or content/projects.yaml on sites
+// set up before the page was renamed from "Projects".
 // ---------------------------------------------------------------------
-app.get("/projects", async (req, res, next) => {
+function loadGalleriesPage() {
+  const current = path.join(DATA_DIR, "content", "galleries.yaml");
+  return loadYamlFile(fs.existsSync(current) ? current : "content/projects.yaml");
+}
+
+app.get("/galleries", async (req, res, next) => {
   try {
-    const projects = loadYamlFile("content/projects.yaml");
+    const page = loadGalleriesPage();
     const galleries = await Promise.all(
-      (projects.galleries || []).map(async (entry) => {
+      (page.galleries || []).map(async (entry) => {
         const gallery = await loadGallery(entry.config);
         return { slug: entry.slug, ...gallery };
       })
     );
     // Private galleries are only reachable through "Your Photos".
-    res.render("projects", { page: projects, galleries: galleries.filter((g) => !g.isPrivate) });
+    res.render("galleries", { page, galleries: galleries.filter((g) => !g.isPrivate) });
   } catch (err) {
     next(err);
   }
 });
 
 // ---------------------------------------------------------------------
-// Individual project gallery page (uses the reusable gallery component
-// in whichever mode - slideshow or thumbnails - its YAML file declares)
+// Individual gallery page (uses the reusable gallery component in
+// whichever mode - slideshow or thumbnails - its YAML file declares)
 // ---------------------------------------------------------------------
-app.get("/projects/:slug", async (req, res, next) => {
+app.get("/galleries/:slug", async (req, res, next) => {
   try {
-    const projects = loadYamlFile("content/projects.yaml");
-    const entry = (projects.galleries || []).find((g) => g.slug === req.params.slug);
+    const page = loadGalleriesPage();
+    const entry = (page.galleries || []).find((g) => g.slug === req.params.slug);
     if (!entry) {
       res.status(404);
       res.render("404", { page: { title: "Not found" } });
@@ -100,6 +107,12 @@ app.get("/projects/:slug", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+// Old "Projects" URLs (bookmarks, search engines) -> the new ones.
+app.get(["/projects", "/projects/*"], (req, res) => {
+  const query = req.originalUrl.slice(req.path.length);
+  res.redirect(301, req.path.replace(/^\/projects/, "/galleries") + query);
 });
 
 // ---------------------------------------------------------------------
@@ -253,7 +266,7 @@ app.post("/contact/verify", (req, res, next) => {
 // with just a YAML file and a navigation entry in config/site.yaml.
 // ---------------------------------------------------------------------
 const CONTENT_PAGE_SLUG = /^[a-z0-9][a-z0-9-]*$/;
-const RESERVED_CONTENT_PAGES = new Set(["home", "projects", "contact", "your-photos"]);
+const RESERVED_CONTENT_PAGES = new Set(["home", "galleries", "projects", "contact", "your-photos"]);
 
 app.get("/:page", async (req, res, next) => {
   const slug = req.params.page;

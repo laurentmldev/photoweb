@@ -1,5 +1,5 @@
-title: "Projects"
-intro: "A selection of personal and client projects. Click a gallery to explore it in full."
+title: "Galleries"
+intro: "A selection of personal and client work. Click a gallery to explore it in full."
 galleries:
   - slug: "weddings"
     config: "galleries/weddings.yaml"

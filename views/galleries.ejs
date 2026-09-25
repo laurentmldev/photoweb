@@ -8,18 +8,18 @@
   <% if (page.intro) { %><p><%= page.intro %></p><% } %>
 </section>
 
-<section class="project-list">
+<section class="gallery-list">
   <% galleries.forEach(function(g) { %>
-    <a class="project-card" href="/projects/<%= g.slug %>">
-      <div class="project-card-thumb">
+    <a class="gallery-card" href="/galleries/<%= g.slug %>">
+      <div class="gallery-card-thumb">
         <% if (g.images.length > 0) { %>
           <img src="<%= g.images[0].src %>" alt="<%= g.images[0].alt %>" loading="lazy" />
         <% } else { %>
-          <div class="project-card-thumb-empty"></div>
+          <div class="gallery-card-thumb-empty"></div>
         <% } %>
       </div>
-      <h2 class="project-card-title"><%= g.title %></h2>
-      <p class="project-card-description"><%= g.description %></p>
+      <h2 class="gallery-card-title"><%= g.title %></h2>
+      <p class="gallery-card-description"><%= g.description %></p>
     </a>
   <% }); %>
 </section>

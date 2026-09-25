@@ -1,6 +1,6 @@
 # A private customer gallery: because it has a `password`, it is never
 # listed on the public site. The customer opens it from the "Your Photos"
-# button on the Projects page by typing its directory name ("client-demo")
+# button on the Galleries page by typing its directory name ("client-demo")
 # and this password.
 directory: "client-demo"
 password: "demo"
