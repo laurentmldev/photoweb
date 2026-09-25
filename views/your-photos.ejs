@@ -1,0 +1,19 @@
+<%- include('partials/layout-top') %>
+
+<section class="page-intro">
+  <h1><%= page.title %></h1>
+  <p>Enter the gallery name and password you were given to see your private photos.</p>
+</section>
+
+<section class="private-login">
+  <% if (error) { %><p class="private-login-error" role="alert"><%= error %></p><% } %>
+  <form method="POST" action="/your-photos">
+    <label for="private-directory">Gallery name</label>
+    <input type="text" id="private-directory" name="directory" value="<%= directory %>" required autocomplete="username" autocapitalize="none" spellcheck="false" />
+    <label for="private-password">Password</label>
+    <input type="password" id="private-password" name="password" required autocomplete="current-password" />
+    <button type="submit" class="button">Open my gallery</button>
+  </form>
+</section>
+
+<%- include('partials/layout-bottom') %>

@@ -1,0 +1,12 @@
+<%- include('partials/layout-top') %>
+
+<div class="private-gallery-bar">
+  <a class="back-link" href="/projects">&larr; All projects</a>
+  <form method="POST" action="/your-photos/logout">
+    <button type="submit" class="link-button">Sign out</button>
+  </form>
+</div>
+
+<%- include('partials/gallery', { gallery: gallery, idPrefix: 'private-gallery' }) %>
+
+<%- include('partials/layout-bottom') %>

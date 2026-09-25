@@ -3,7 +3,8 @@ const path = require("path");
 const express = require("express");
 
 const { DATA_DIR, SCRIPT_FALLBACK_FONT_URL, loadSiteConfig, loadYamlFile } = require("./lib/config");
-const { loadGallery, PHOTOS_ROOT } = require("./lib/gallery");
+const { loadGallery, PHOTOS_ROOT, IMAGE_EXTENSIONS } = require("./lib/gallery");
+const privateGalleries = require("./lib/private-galleries");
 const { createChallenge, verifyChallenge } = require("./lib/captcha");
 const { renderQuestionImage } = require("./lib/captcha-image");
 
@@ -18,13 +19,18 @@ function buildChallenge() {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Behind the nginx reverse proxy (see docker-compose.yml): trust its
+// X-Forwarded-* headers so req.ip / req.secure reflect the real client.
+app.set("trust proxy", "loopback, uniquelocal");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: false }));
 
 // Static assets
 app.use("/public", express.static(path.join(__dirname, "public")));
-app.use("/photos", express.static(PHOTOS_ROOT));
+// Private galleries' photos are never served here, only through the
+// password-protected /your-photos routes below.
+app.use("/photos", privateGalleries.blockPrivatePhotos, express.static(PHOTOS_ROOT));
 
 // Make the (dynamically loaded) global site config available to every view.
 app.use((req, res, next) => {
@@ -64,7 +70,8 @@ app.get("/projects", async (req, res, next) => {
         return { slug: entry.slug, ...gallery };
       })
     );
-    res.render("projects", { page: projects, galleries });
+    // Private galleries are only reachable through "Your Photos".
+    res.render("projects", { page: projects, galleries: galleries.filter((g) => !g.isPrivate) });
   } catch (err) {
     next(err);
   }
@@ -84,10 +91,98 @@ app.get("/projects/:slug", async (req, res, next) => {
       return;
     }
     const gallery = await loadGallery(entry.config);
+    if (gallery.isPrivate) {
+      res.status(404);
+      res.render("404", { page: { title: "Not found" } });
+      return;
+    }
     res.render("gallery", { page: gallery, gallery, slug: entry.slug });
   } catch (err) {
     next(err);
   }
+});
+
+// ---------------------------------------------------------------------
+// "Your Photos": customers' private galleries. A customer types the
+// gallery's directory name and the password from its YAML file; a
+// signed cookie then grants access to that gallery (see
+// lib/private-galleries.js).
+// ---------------------------------------------------------------------
+const YOUR_PHOTOS_PAGE = { title: "Your Photos" };
+
+function privateGalleryUrl(gallery) {
+  return `/your-photos/${encodeURIComponent(gallery.directory)}`;
+}
+
+app.get("/your-photos", (req, res) => {
+  res.render("your-photos", { page: YOUR_PHOTOS_PAGE, error: null, directory: "" });
+});
+
+app.post("/your-photos", (req, res) => {
+  const directory = String(req.body.directory || "").trim();
+  const renderError = (status, error) =>
+    res.status(status).render("your-photos", { page: YOUR_PHOTOS_PAGE, error, directory });
+
+  if (privateGalleries.isRateLimited(req.ip)) {
+    renderError(429, "Too many attempts - please try again in a few minutes.");
+    return;
+  }
+  const gallery = privateGalleries.findPrivateGallery(directory);
+  // Always compare a password, even for an unknown gallery, so the
+  // response time doesn't reveal which gallery names exist.
+  const ok = privateGalleries.passwordMatches(req.body.password, gallery ? gallery.password : "\0");
+  if (!gallery || !ok) {
+    privateGalleries.recordFailedAttempt(req.ip);
+    // Same message either way: don't reveal which gallery names exist.
+    renderError(401, "Unknown gallery name or wrong password.");
+    return;
+  }
+  privateGalleries.grantAccess(req, res, gallery);
+  res.redirect(303, privateGalleryUrl(gallery));
+});
+
+app.post("/your-photos/logout", (req, res) => {
+  privateGalleries.revokeAccess(req, res);
+  res.redirect(303, "/your-photos");
+});
+
+app.get("/your-photos/:directory", async (req, res, next) => {
+  try {
+    const gallery = privateGalleries.findPrivateGallery(req.params.directory);
+    if (!gallery || !privateGalleries.hasAccess(req, gallery)) {
+      res.redirect(303, "/your-photos");
+      return;
+    }
+    const loaded = await loadGallery(gallery.configPath, {
+      urlPrefix: `${privateGalleryUrl(gallery)}/photos`,
+    });
+    res.set("Cache-Control", "private, no-store");
+    res.render("private-gallery", { page: loaded, gallery: loaded });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get("/your-photos/:directory/photos/:file", (req, res) => {
+  const gallery = privateGalleries.findPrivateGallery(req.params.directory);
+  const file = req.params.file;
+  if (
+    !gallery ||
+    !privateGalleries.hasAccess(req, gallery) ||
+    file !== path.basename(file) ||
+    file.startsWith(".") ||
+    !IMAGE_EXTENSIONS.has(path.extname(file).toLowerCase())
+  ) {
+    res.sendStatus(404);
+    return;
+  }
+  // `root` keeps sendFile from ever leaving the gallery's directory.
+  res.sendFile(file, {
+    root: path.join(PHOTOS_ROOT, gallery.directory),
+    headers: { "Cache-Control": "private, max-age=3600" },
+  }, (err) => {
+    if (err && !res.headersSent) res.sendStatus(404);
+  });
 });
 
 // ---------------------------------------------------------------------
@@ -138,7 +233,7 @@ app.post("/contact/verify", (req, res, next) => {
 // with just a YAML file and a navigation entry in config/site.yaml.
 // ---------------------------------------------------------------------
 const CONTENT_PAGE_SLUG = /^[a-z0-9][a-z0-9-]*$/;
-const RESERVED_CONTENT_PAGES = new Set(["home", "projects", "contact"]);
+const RESERVED_CONTENT_PAGES = new Set(["home", "projects", "contact", "your-photos"]);
 
 app.get("/:page", async (req, res, next) => {
   const slug = req.params.page;

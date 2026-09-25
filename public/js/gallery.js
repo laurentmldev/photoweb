@@ -138,6 +138,20 @@
     });
   }
 
+  // Discourage saving photos: no right-click "Save image as..." menu and
+  // no dragging images out of the page, on every page of the site. This
+  // only deters casual copying - anything a browser displays can still be
+  // captured (screenshots, developer tools).
+  function isImage(target) {
+    return target && target.tagName === "IMG";
+  }
+  document.addEventListener("contextmenu", function (e) {
+    if (isImage(e.target)) e.preventDefault();
+  });
+  document.addEventListener("dragstart", function (e) {
+    if (isImage(e.target)) e.preventDefault();
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     setupLightbox();
     document.querySelectorAll('[data-component="slideshow"]').forEach(initSlideshow);
