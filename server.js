@@ -115,16 +115,36 @@ function privateGalleryUrl(gallery) {
 }
 
 app.get("/your-photos", (req, res) => {
-  res.render("your-photos", { page: YOUR_PHOTOS_PAGE, error: null, directory: "" });
+  res.render("your-photos", {
+    page: YOUR_PHOTOS_PAGE,
+    error: null,
+    directory: "",
+    challenge: buildChallenge(),
+  });
 });
 
 app.post("/your-photos", (req, res) => {
   const directory = String(req.body.directory || "").trim();
   const renderError = (status, error) =>
-    res.status(status).render("your-photos", { page: YOUR_PHOTOS_PAGE, error, directory });
+    res.status(status).render("your-photos", {
+      page: YOUR_PHOTOS_PAGE,
+      error,
+      directory,
+      challenge: buildChallenge(),
+    });
 
   if (privateGalleries.isRateLimited(req.ip)) {
     renderError(429, "Too many attempts - please try again in a few minutes.");
+    return;
+  }
+  // Same self-hosted human check as the contact page, verified before
+  // the password is even looked at.
+  const { token, answer, nonce } = req.body;
+  if (!verifyChallenge(token, answer, nonce)) {
+    // Counted too: the answer is only 2-16, so otherwise a bot could
+    // mine one proof of work and then simply try every answer.
+    privateGalleries.recordFailedAttempt(req.ip);
+    renderError(400, "That didn't check out - please try again.");
     return;
   }
   const gallery = privateGalleries.findPrivateGallery(directory);

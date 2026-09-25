@@ -7,13 +7,28 @@
 
 <section class="private-login">
   <% if (error) { %><p class="private-login-error" role="alert"><%= error %></p><% } %>
-  <form method="POST" action="/your-photos">
+  <form
+    class="human-check-form"
+    method="POST"
+    action="/your-photos"
+    data-pow-token="<%= challenge.token %>"
+    data-pow-difficulty="<%= challenge.difficulty %>"
+  >
     <label for="private-directory">Gallery name</label>
     <input type="text" id="private-directory" name="directory" value="<%= directory %>" required autocomplete="username" autocapitalize="none" spellcheck="false" />
     <label for="private-password">Password</label>
     <input type="password" id="private-password" name="password" required autocomplete="current-password" />
-    <button type="submit" class="button">Open my gallery</button>
+    <div class="private-login-check">
+      <%- include('partials/human-check-question', { challenge: challenge }) %>
+      <div class="human-check-row">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="captcha-answer" name="answer" required autocomplete="off" />
+        <button type="submit" disabled>Open my gallery</button>
+      </div>
+      <p class="pow-status" role="status">Preparing verification…</p>
+    </div>
   </form>
 </section>
+
+<script src="/public/js/captcha-pow.js"></script>
 
 <%- include('partials/layout-bottom') %>

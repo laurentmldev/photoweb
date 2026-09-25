@@ -1,0 +1,17 @@
+<%
+// Shared "I'm not a robot" question (see lib/captcha.js). Expects
+// `challenge`. The enclosing form must carry data-pow-token /
+// data-pow-difficulty, contain an input named "answer" and a submit
+// button, and load /public/js/captcha-pow.js.
+%>
+<label for="captcha-answer">What does this add up to?</label>
+<img
+  class="human-check-image"
+  src="<%= challenge.imageDataUri %>"
+  width="180"
+  height="70"
+  alt="A simple addition question, shown as a distorted image rather than text."
+  draggable="false"
+/>
+<input type="hidden" name="token" value="<%= challenge.token %>" />
+<input type="hidden" name="nonce" value="" />

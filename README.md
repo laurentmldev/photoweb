@@ -156,7 +156,8 @@ title: "Anna & Marc - 14 June"
 - Customers click **Your Photos** on the Projects page, type the directory
   name (case-insensitive) and the password. Access is kept for 12 hours by
   a signed cookie; changing the password in the YAML file revokes it
-  immediately. Repeated wrong passwords are rate-limited per IP (10 per
+  immediately. The form also has the same human check as the contact page
+  (see below), and repeated wrong passwords are rate-limited per IP (10 per
   15 minutes).
 - The cookie signing secret is random per server start (customers log in
   again after a restart). Set `GALLERY_ACCESS_SECRET` to pin it.

@@ -16,19 +16,9 @@
       data-pow-token="<%= challenge.token %>"
       data-pow-difficulty="<%= challenge.difficulty %>"
     >
-      <label for="captcha-answer">What does this add up to?</label>
-      <img
-        class="human-check-image"
-        src="<%= challenge.imageDataUri %>"
-        width="180"
-        height="70"
-        alt="A simple addition question, shown as a distorted image rather than text."
-        draggable="false"
-      />
+      <%- include('partials/human-check-question', { challenge: challenge }) %>
       <div class="human-check-row">
         <input type="text" inputmode="numeric" pattern="[0-9]*" id="captcha-answer" name="answer" required autocomplete="off" />
-        <input type="hidden" name="token" value="<%= challenge.token %>" />
-        <input type="hidden" name="nonce" value="" />
         <button type="submit" disabled>Show contact details</button>
       </div>
       <p class="pow-status" role="status">Preparing verification…</p>
