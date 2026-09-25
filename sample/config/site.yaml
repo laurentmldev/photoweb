@@ -28,7 +28,8 @@ theme:
 
   headingFont: "'Cormorant Garamond', Georgia, serif"
   bodyFont: "'Inter', -apple-system, Helvetica, Arial, sans-serif"
-  # Logo text and gallery titles. Default: Mistral where installed, else the
+  # Logo text, gallery titles and page headings (the `heading:` of
+  # content/home.yaml, content/weddings.yaml, ...). Default: Mistral where installed, else the
   # look-alike Google font Kaushan Script (loaded automatically), else cursive.
   logoFont: "Mistral, 'Kaushan Script', cursive"
   galleryTitleFont: "Mistral, 'Kaushan Script', cursive"
