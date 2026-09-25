@@ -1,4 +1,4 @@
-// Proof-of-work solver for the contact-page human check.
+// Proof-of-work solver for the human check (contact page, "Your Photos").
 //
 // Runs entirely in the browser: no library, no network calls, nothing
 // leaves the page. It repeatedly hashes token + ":" + nonce with SHA-256

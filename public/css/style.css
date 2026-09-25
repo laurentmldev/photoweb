@@ -285,7 +285,11 @@ main {
   font: inherit;
   background: #fff;
 }
-.private-login .button { margin-top: 1rem; align-self: flex-start; }
+.private-login-check {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
 .private-login-error { color: #b3261e; font-size: 0.9rem; }
 .private-gallery-bar {
   display: flex;
