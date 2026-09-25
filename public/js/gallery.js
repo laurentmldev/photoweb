@@ -12,7 +12,7 @@
   // ---------------------------------------------------------------------
   // Lightbox: shared single overlay, opened by any gallery on the page.
   // ---------------------------------------------------------------------
-  var lightboxEl, lightboxImg, lightboxCaption, lightboxPrev, lightboxNext, lightboxClose;
+  var lightboxEl, lightboxImg, lightboxCaption, lightboxCounter, lightboxPrev, lightboxNext, lightboxClose;
   var currentImages = [];
   var currentIndex = 0;
 
@@ -21,6 +21,7 @@
     if (!lightboxEl) return;
     lightboxImg = lightboxEl.querySelector(".lightbox-image");
     lightboxCaption = lightboxEl.querySelector(".lightbox-caption");
+    lightboxCounter = lightboxEl.querySelector(".lightbox-counter");
     lightboxPrev = lightboxEl.querySelector(".lightbox-prev");
     lightboxNext = lightboxEl.querySelector(".lightbox-next");
     lightboxClose = lightboxEl.querySelector(".lightbox-close");
@@ -56,6 +57,14 @@
     lightboxImg.alt = img.alt || "";
     lightboxCaption.textContent = img.alt || "";
     var multi = currentImages.length > 1;
+    if (lightboxCounter) lightboxCounter.textContent = multi ? (currentIndex + 1) + " / " + currentImages.length : "";
+    // Warm the cache for the neighbours, so stepping through a big
+    // gallery doesn't wait on each photo.
+    if (multi) {
+      [currentIndex + 1, currentIndex - 1].forEach(function (i) {
+        new Image().src = currentImages[(i + currentImages.length) % currentImages.length].src;
+      });
+    }
     lightboxPrev.style.display = multi ? "" : "none";
     lightboxNext.style.display = multi ? "" : "none";
   }
@@ -84,7 +93,23 @@
     var dots = Array.prototype.slice.call(root.querySelectorAll(".slide-dot"));
     var prevBtn = root.querySelector(".slide-prev");
     var nextBtn = root.querySelector(".slide-next");
+    // Big galleries: progress bar + counter instead of one dot per photo.
+    var track = root.querySelector(".slide-progress-track");
+    var fill = root.querySelector(".slide-progress-fill");
+    var counter = root.querySelector(".slide-counter");
     if (slides.length <= 1) return;
+
+    // Photos other than the first carry data-src and are only loaded when
+    // they (or a neighbour) become current.
+    function ensureLoaded(index) {
+      var img = slides[(index + slides.length) % slides.length].querySelector("img[data-src]");
+      if (img) {
+        img.src = img.dataset.src;
+        img.removeAttribute("data-src");
+      }
+    }
+    ensureLoaded(1);
+    ensureLoaded(-1);
 
     var current = 0;
     var intervalSeconds = parseFloat(root.dataset.interval);
@@ -95,8 +120,14 @@
       slides[current].classList.remove("is-active");
       if (dots[current]) dots[current].classList.remove("is-active");
       current = (index + slides.length) % slides.length;
+      ensureLoaded(current);
+      ensureLoaded(current + 1);
+      ensureLoaded(current - 1);
       slides[current].classList.add("is-active");
       if (dots[current]) dots[current].classList.add("is-active");
+      if (fill) fill.style.width = ((current + 1) / slides.length) * 100 + "%";
+      if (counter) counter.textContent = (current + 1) + " / " + slides.length;
+      if (track) track.setAttribute("aria-valuenow", current + 1);
     }
 
     function next() { show(current + 1); }
@@ -119,6 +150,27 @@
         startAutoplay();
       });
     });
+
+    if (track) {
+      // Click/tap anywhere on the bar to jump to that point of the gallery.
+      track.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var rect = track.getBoundingClientRect();
+        var ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 0.9999);
+        show(Math.floor(ratio * slides.length));
+        startAutoplay();
+      });
+      track.addEventListener("keydown", function (e) {
+        var step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1,
+                     PageUp: 10, PageDown: -10 }[e.key];
+        if (e.key === "Home") step = -current;
+        if (e.key === "End") step = slides.length - 1 - current;
+        if (step === undefined) return;
+        e.preventDefault();
+        show(current + step);
+        startAutoplay();
+      });
+    }
 
     root.addEventListener("mouseenter", stopAutoplay);
     root.addEventListener("mouseleave", startAutoplay);

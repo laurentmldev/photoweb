@@ -1,9 +1,11 @@
 <%- include('partials/layout-top') %>
 
 <section class="page-intro">
-  <h1><%= page.title %></h1>
+  <div class="page-intro-header">
+    <h1><%= page.title %></h1>
+    <a class="button" href="/your-photos">Your Photos</a>
+  </div>
   <% if (page.intro) { %><p><%= page.intro %></p><% } %>
-  <a class="button" href="/your-photos">Your Photos</a>
 </section>
 
 <section class="project-list">

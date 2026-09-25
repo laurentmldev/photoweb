@@ -84,6 +84,14 @@ main {
 .hero-intro { max-width: 560px; margin: 0.75rem auto 0; color: var(--color-muted); }
 
 .page-intro { margin-bottom: 2rem; }
+/* Title on the left, action button (e.g. "Your Photos") top right. */
+.page-intro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
 .page-intro p { color: var(--color-muted); max-width: 620px; }
 
 .back-link {
@@ -189,6 +197,36 @@ main {
   cursor: pointer;
 }
 .slide-dot.is-active { background: var(--color-accent); }
+/* Big galleries: progress bar + counter instead of dots. */
+.slide-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 480px;
+  margin: 1rem auto 0;
+}
+.slide-progress-track {
+  flex: 1;
+  /* Tall invisible hit area around a thin visible bar. */
+  padding: 8px 0;
+  cursor: pointer;
+  background: linear-gradient(var(--color-border), var(--color-border)) center / 100% 4px no-repeat;
+  border-radius: 2px;
+}
+.slide-progress-track:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.slide-progress-fill {
+  height: 4px;
+  min-width: 4px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.slide-counter {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 
 /* ---------- Thumbnails mode ---------- */
 .thumbnail-grid {
@@ -423,6 +461,12 @@ main {
   font-size: 0.9rem;
   text-align: center;
   max-width: 60ch;
+}
+.lightbox-counter {
+  color: rgba(245, 243, 239, 0.7);
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
 }
 .lightbox-close {
   position: absolute;

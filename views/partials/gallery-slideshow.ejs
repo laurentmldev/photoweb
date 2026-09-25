@@ -2,6 +2,9 @@
 // Expects a local variable `gallery` = { title, description, mode, interval, images: [{src, alt}] }
 // and an optional `idPrefix` to allow multiple slideshows on one page.
 const prefix = typeof idPrefix !== 'undefined' ? idPrefix : 'slideshow';
+// One dot per photo only for small galleries; bigger ones get a
+// progress bar + "n / total" counter instead.
+const MAX_DOTS = 12;
 %>
 <div class="gallery gallery--slideshow" data-component="slideshow" data-interval="<%= gallery.interval %>" id="<%= prefix %>">
   <% if (gallery.images.length === 0) { %>
@@ -11,7 +14,14 @@ const prefix = typeof idPrefix !== 'undefined' ? idPrefix : 'slideshow';
       <% gallery.images.forEach(function(img, i) { %>
         <figure class="slide <%= i === 0 ? 'is-active' : '' %>">
           <button type="button" class="slide-trigger" data-index="<%= i %>" aria-label="Enlarge photo">
-            <img src="<%= img.src %>" alt="<%= img.alt %>" loading="<%= i === 0 ? 'eager' : 'lazy' %>" />
+            <%# Only the first photo loads with the page; gallery.js loads
+                the others on demand (current + neighbours), so a gallery
+                of hundreds of photos doesn't download them all at once. %>
+            <% if (i === 0) { %>
+              <img src="<%= img.src %>" alt="<%= img.alt %>" />
+            <% } else { %>
+              <img data-src="<%= img.src %>" alt="<%= img.alt %>" />
+            <% } %>
           </button>
         </figure>
       <% }); %>
@@ -19,11 +29,28 @@ const prefix = typeof idPrefix !== 'undefined' ? idPrefix : 'slideshow';
     <% if (gallery.images.length > 1) { %>
       <button class="slide-nav slide-prev" type="button" aria-label="Previous photo">&#8249;</button>
       <button class="slide-nav slide-next" type="button" aria-label="Next photo">&#8250;</button>
-      <div class="slide-dots">
-        <% gallery.images.forEach(function(img, i) { %>
-          <button class="slide-dot <%= i === 0 ? 'is-active' : '' %>" type="button" data-index="<%= i %>" aria-label="Go to photo <%= i + 1 %>"></button>
-        <% }); %>
-      </div>
+      <% if (gallery.images.length <= MAX_DOTS) { %>
+        <div class="slide-dots">
+          <% gallery.images.forEach(function(img, i) { %>
+            <button class="slide-dot <%= i === 0 ? 'is-active' : '' %>" type="button" data-index="<%= i %>" aria-label="Go to photo <%= i + 1 %>"></button>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="slide-progress">
+          <div
+            class="slide-progress-track"
+            role="slider"
+            tabindex="0"
+            aria-label="Photo position"
+            aria-valuemin="1"
+            aria-valuemax="<%= gallery.images.length %>"
+            aria-valuenow="1"
+          >
+            <div class="slide-progress-fill" style="width: <%= 100 / gallery.images.length %>%;"></div>
+          </div>
+          <span class="slide-counter">1 / <%= gallery.images.length %></span>
+        </div>
+      <% } %>
     <% } %>
     <script type="application/json" class="gallery-data"><%- JSON.stringify(gallery.images).replace(/</g, '\\u003c') %></script>
   <% } %>
