@@ -143,7 +143,12 @@ drives:
 
 - site title / tagline / logo text
 - color palette ("charte graphique"): primary, secondary, accent, muted, border, header background, footer background
-- fonts (heading / body), optional Google Fonts URL
+- fonts (heading / body / logo / gallery titles), optional Google Fonts URL.
+  `logoFont` and `galleryTitleFont` default to Mistral, falling back to the
+  look-alike Google font Kaushan Script (loaded automatically when used)
+- optional logo image (`site.logoImage`, `site.logoImageHeight`) shown
+  instead of `logoText`; e.g. put the file in `photos/branding/logo.png`
+  and set `logoImage: "/photos/branding/logo.png"`
 - top navigation links
 - footer text & social links
 

@@ -9,6 +9,11 @@ site:
   title: "Elena Moreau Photography"
   tagline: "Fine-art & documentary photography"
   logoText: "E. Moreau"
+  # Optional image shown instead of logoText (logoText is kept as its alt
+  # text). Files under photos/ are served at /photos/..., e.g. put
+  # photos/branding/logo.png and use "/photos/branding/logo.png".
+  logoImage: ""
+  logoImageHeight: 48            # logo image height in px
   language: "en"
 
 theme:
@@ -23,6 +28,10 @@ theme:
 
   headingFont: "'Cormorant Garamond', Georgia, serif"
   bodyFont: "'Inter', -apple-system, Helvetica, Arial, sans-serif"
+  # Logo text and gallery titles. Default: Mistral where installed, else the
+  # look-alike Google font Kaushan Script (loaded automatically), else cursive.
+  logoFont: "Mistral, 'Kaushan Script', cursive"
+  galleryTitleFont: "Mistral, 'Kaushan Script', cursive"
 
   # Optional Google Fonts import (leave empty to disable)
   googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&display=swap"

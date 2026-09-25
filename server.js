@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 
-const { DATA_DIR, loadSiteConfig, loadYamlFile } = require("./lib/config");
+const { DATA_DIR, SCRIPT_FALLBACK_FONT_URL, loadSiteConfig, loadYamlFile } = require("./lib/config");
 const { loadGallery, PHOTOS_ROOT } = require("./lib/gallery");
 const { createChallenge, verifyChallenge } = require("./lib/captcha");
 const { renderQuestionImage } = require("./lib/captcha-image");
@@ -31,6 +31,7 @@ app.use((req, res, next) => {
   try {
     res.locals.siteConfig = loadSiteConfig();
     res.locals.currentPath = req.path;
+    res.locals.scriptFallbackFontUrl = SCRIPT_FALLBACK_FONT_URL;
   } catch (err) {
     next(err);
     return;
