@@ -135,6 +135,39 @@ to `"<gallery title> - <file name>"`.
 | `/projects/:slug`   | entry in `content/projects.yaml`        | Full gallery (slideshow or thumbnails, per its own YAML) |
 | `/contact`          | `content/contact.yaml`                  | Contact details & social links |
 | `/<name>`           | `content/<name>.yaml` (with a `gallery:` key) | Extra top-level page: hero text + one gallery. E.g. `content/weddings.yaml` → `/weddings`; add it to `navigation` in `config/site.yaml` to show it as a tab |
+| `/your-photos`      | any `galleries/*.yaml` with a `password` | Customer login (gallery name + password) for private galleries |
+
+## Private customer galleries ("Your Photos")
+
+Give a gallery YAML file a `password` to make it private:
+
+```yaml
+# galleries/smith-wedding.yaml
+directory: "smith-wedding"   # photos/smith-wedding/ - also the "gallery name" the customer types
+password: "choose-a-good-one"
+mode: "thumbnails"
+title: "Anna & Marc - 14 June"
+```
+
+- It never appears on the public site: not in the Projects list (even if
+  `content/projects.yaml` references it), and `/projects/<slug>` returns 404.
+- Its photos are **not** served from the public `/photos/...` URLs, only
+  through `/your-photos/<directory>/photos/...` to a visitor who logged in.
+- Customers click **Your Photos** on the Projects page, type the directory
+  name (case-insensitive) and the password. Access is kept for 12 hours by
+  a signed cookie; changing the password in the YAML file revokes it
+  immediately. Repeated wrong passwords are rate-limited per IP (10 per
+  15 minutes).
+- The cookie signing secret is random per server start (customers log in
+  again after a restart). Set `GALLERY_ACCESS_SECRET` to pin it.
+
+## Image save protection
+
+On every page, right-click / "Save image as...", dragging images out and
+the iOS long-press menu are disabled for images (`public/js/gallery.js`,
+`public/css/style.css`). This only deters casual copying: whatever a
+browser displays can still be captured with a screenshot or the
+developer tools.
 
 ## Global / graphic configuration
 

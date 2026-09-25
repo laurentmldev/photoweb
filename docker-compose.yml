@@ -31,6 +31,8 @@ services:
       # every start, 18-bit PoW). See .env.example for details.
       CAPTCHA_SECRET: ${CAPTCHA_SECRET:-}
       CAPTCHA_POW_BITS: ${CAPTCHA_POW_BITS:-18}
+      # Optional: pin the signing secret of private-gallery access cookies.
+      GALLERY_ACCESS_SECRET: ${GALLERY_ACCESS_SECRET:-}
     volumes:
       # External volumes: real directories on the host server, so a
       # photographer can edit YAML / drop in photos without touching
