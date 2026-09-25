@@ -1,7 +1,8 @@
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 
-const { loadSiteConfig, loadYamlFile } = require("./lib/config");
+const { DATA_DIR, loadSiteConfig, loadYamlFile } = require("./lib/config");
 const { loadGallery, PHOTOS_ROOT } = require("./lib/gallery");
 const { createChallenge, verifyChallenge } = require("./lib/captcha");
 const { renderQuestionImage } = require("./lib/captcha-image");
@@ -124,6 +125,39 @@ app.post("/contact/verify", (req, res, next) => {
         error: "That didn't check out - please try again.",
       });
     }
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------------------------------------------------------------------
+// Generic content pages: any content/<name>.yaml that declares a
+// `gallery:` is served at /<name> (hero text + that gallery), e.g.
+// content/weddings.yaml -> /weddings. Lets a new top-level tab be added
+// with just a YAML file and a navigation entry in config/site.yaml.
+// ---------------------------------------------------------------------
+const CONTENT_PAGE_SLUG = /^[a-z0-9][a-z0-9-]*$/;
+const RESERVED_CONTENT_PAGES = new Set(["home", "projects", "contact"]);
+
+app.get("/:page", async (req, res, next) => {
+  const slug = req.params.page;
+  if (!CONTENT_PAGE_SLUG.test(slug) || RESERVED_CONTENT_PAGES.has(slug)) {
+    next();
+    return;
+  }
+  const relPath = path.join("content", `${slug}.yaml`);
+  if (!fs.existsSync(path.join(DATA_DIR, relPath))) {
+    next();
+    return;
+  }
+  try {
+    const page = loadYamlFile(relPath);
+    if (!page.gallery) {
+      next();
+      return;
+    }
+    const gallery = await loadGallery(page.gallery);
+    res.render("page", { page, gallery, slug });
   } catch (err) {
     next(err);
   }
