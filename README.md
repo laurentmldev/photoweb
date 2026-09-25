@@ -134,6 +134,7 @@ to `"<gallery title> - <file name>"`.
 | `/projects`         | `content/projects.yaml`                 | Grid of galleries, one thumbnail preview each |
 | `/projects/:slug`   | entry in `content/projects.yaml`        | Full gallery (slideshow or thumbnails, per its own YAML) |
 | `/contact`          | `content/contact.yaml`                  | Contact details & social links |
+| `/<name>`           | `content/<name>.yaml` (with a `gallery:` key) | Extra top-level page: hero text + one gallery. E.g. `content/weddings.yaml` → `/weddings`; add it to `navigation` in `config/site.yaml` to show it as a tab |
 
 ## Global / graphic configuration
 

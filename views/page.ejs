@@ -1,0 +1,10 @@
+<%- include('partials/layout-top') %>
+
+<section class="hero">
+  <h1><%= page.heading %></h1>
+  <% if (page.intro) { %><p class="hero-intro"><%= page.intro %></p><% } %>
+</section>
+
+<%- include('partials/gallery', { gallery: gallery, idPrefix: slug + '-gallery' }) %>
+
+<%- include('partials/layout-bottom') %>
