@@ -253,13 +253,13 @@ main {
 }
 .thumbnail:hover img { transform: scale(1.05); }
 
-/* ---------- Projects list ---------- */
-.project-list {
+/* ---------- Galleries list ---------- */
+.gallery-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 2rem;
 }
-.project-card-thumb {
+.gallery-card-thumb {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 4px;
@@ -267,25 +267,25 @@ main {
   /* Same as the page, so letterboxing around fitted photos is invisible. */
   background: var(--color-secondary);
 }
-.project-card-thumb-empty {
+.gallery-card-thumb-empty {
   width: 100%;
   height: 100%;
   background: var(--color-border);
 }
-.project-card-thumb img {
+.gallery-card-thumb img {
   width: 100%;
   height: 100%;
   /* Show the whole cover photo, never crop it. */
   object-fit: contain;
   transition: transform 0.35s ease;
 }
-.project-card:hover .project-card-thumb img { transform: scale(1.06); }
-.project-card-title {
+.gallery-card:hover .gallery-card-thumb img { transform: scale(1.06); }
+.gallery-card-title {
   font-family: var(--font-gallery-title);
   font-weight: 400;
   font-size: 1.6rem;
 }
-.project-card-description { color: var(--color-muted); font-size: 0.95rem; }
+.gallery-card-description { color: var(--color-muted); font-size: 0.95rem; }
 
 /* ---------- Buttons ---------- */
 .button {

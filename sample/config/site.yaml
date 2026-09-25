@@ -40,8 +40,8 @@ theme:
 navigation:
   - label: "Home"
     path: "/"
-  - label: "Projects"
-    path: "/projects"
+  - label: "Galleries"
+    path: "/galleries"
   - label: "Contact"
     path: "/contact"
 
