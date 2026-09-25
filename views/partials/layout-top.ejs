@@ -7,24 +7,42 @@
   <% if (siteConfig.theme.googleFontsUrl) { %>
     <link rel="stylesheet" href="<%= siteConfig.theme.googleFontsUrl %>" />
   <% } %>
+  <% if (/Kaushan Script/.test(siteConfig.theme.logoFont + siteConfig.theme.galleryTitleFont)) { %>
+    <link rel="stylesheet" href="<%= scriptFallbackFontUrl %>" />
+  <% } %>
   <link rel="stylesheet" href="/public/css/style.css" />
+  <%
+  // Theme values go into a <style> block, where HTML escaping
+  // turns quotes into &#39; and breaks font names like 'Inter'. Output
+  // them raw instead, stripping characters that could end the declaration
+  // or the <style> element.
+  const css = (v) => String(v == null ? '' : v).replace(/[<>{};]/g, '');
+  %>
   <style>
     :root {
-      --color-primary: <%= siteConfig.theme.primaryColor %>;
-      --color-secondary: <%= siteConfig.theme.secondaryColor %>;
-      --color-accent: <%= siteConfig.theme.accentColor %>;
-      --color-muted: <%= siteConfig.theme.mutedColor %>;
-      --color-border: <%= siteConfig.theme.borderColor %>;
-      --color-header-bg: <%= siteConfig.theme.headerBackgroundColor %>;
-      --color-footer-bg: <%= siteConfig.theme.footerBackgroundColor %>;
-      --font-heading: <%= siteConfig.theme.headingFont %>;
-      --font-body: <%= siteConfig.theme.bodyFont %>;
+      --color-primary: <%- css(siteConfig.theme.primaryColor) %>;
+      --color-secondary: <%- css(siteConfig.theme.secondaryColor) %>;
+      --color-accent: <%- css(siteConfig.theme.accentColor) %>;
+      --color-muted: <%- css(siteConfig.theme.mutedColor) %>;
+      --color-border: <%- css(siteConfig.theme.borderColor) %>;
+      --color-header-bg: <%- css(siteConfig.theme.headerBackgroundColor) %>;
+      --color-footer-bg: <%- css(siteConfig.theme.footerBackgroundColor) %>;
+      --font-heading: <%- css(siteConfig.theme.headingFont) %>;
+      --font-body: <%- css(siteConfig.theme.bodyFont) %>;
+      --font-logo: <%- css(siteConfig.theme.logoFont) %>;
+      --font-gallery-title: <%- css(siteConfig.theme.galleryTitleFont) %>;
     }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <a class="logo" href="/"><%= siteConfig.site.logoText %></a>
+    <a class="logo" href="/">
+      <% if (siteConfig.site.logoImage) { %>
+        <img class="logo-image" src="<%= siteConfig.site.logoImage %>" alt="<%= siteConfig.site.logoText %>" style="height: <%= siteConfig.site.logoImageHeight %>px;" />
+      <% } else { %>
+        <%= siteConfig.site.logoText %>
+      <% } %>
+    </a>
     <nav class="main-nav">
       <% (siteConfig.navigation || []).forEach(function(item) { %>
         <a href="<%= item.path %>" class="<%= currentPath === item.path ? 'active' : '' %>"><%= item.label %></a>
