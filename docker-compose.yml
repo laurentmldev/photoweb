@@ -11,16 +11,16 @@ services:
       # you@vps`), but not from the internet. Public traffic comes in
       # exclusively through the reverse-proxy stack (../reverse-proxy),
       # over the "edge" network below - that's what enforces HTTPS-only.
-      - "127.0.0.1:${HOST_PORT:-3000}:3000"
+      - "127.0.0.1:${HOST_PORT:-4000}:3000"
     networks:
       - edge
     environment:
-      PORT: 3000
+      PORT: 4000
       # Picked up by nginx-proxy (on the "edge" network) to auto-route
       # https://photo.laurentml.fr here and get it a Let's Encrypt
       # certificate - see ../reverse-proxy/docker-compose.yml.
       VIRTUAL_HOST: photo.laurentml.fr
-      VIRTUAL_PORT: "3000"
+      VIRTUAL_PORT: "4000"
       LETSENCRYPT_HOST: photo.laurentml.fr
       # Ownership applied inside the container to whatever the four
       # volumes below resolve to on the host (see docker-entrypoint.sh).
