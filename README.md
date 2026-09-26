@@ -117,14 +117,21 @@ underneath (see next section).
 
 ### Captions from image metadata
 
-Each image's caption (used as its `alt` text and shown under it in the
-lightbox) is read from that photo file's own embedded metadata —
-EXIF `ImageDescription`, or an IPTC/XMP caption/description tag — using
-the `exifr` library. This lets a photographer caption images directly
-from Lightroom, `exiftool`, or similar tools instead of editing YAML.
-Supported for JPEG, PNG, WebP, TIFF and HEIC; if a file has no such tag
-(or is a format with no metadata, like SVG/GIF), the caption falls back
-to `"<gallery title> - <file name>"`.
+Each image's **title** and **caption** are read from that photo file's
+own embedded metadata, using the `exifr` library, so a photographer can
+label images directly from Lightroom, `exiftool`, or similar tools
+instead of editing YAML:
+
+- title: XMP `dc:title` (Lightroom's *Title*), IPTC *Object Name*, or
+  Windows *Title*
+- caption: EXIF `ImageDescription`, XMP `dc:description` or IPTC
+  *Caption-Abstract* (Lightroom's *Caption*)
+
+The lightbox shows the title as a heading with the caption below it, and
+`"<title> - <caption>"` is used as the image's `alt` text. Supported for
+JPEG, PNG, WebP, TIFF and HEIC; if a file has neither (or is a format with
+no metadata, like SVG/GIF), `"<gallery title> - <file name>"` is used
+instead.
 
 ## Pages
 

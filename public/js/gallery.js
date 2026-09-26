@@ -12,7 +12,7 @@
   // ---------------------------------------------------------------------
   // Lightbox: shared single overlay, opened by any gallery on the page.
   // ---------------------------------------------------------------------
-  var lightboxEl, lightboxImg, lightboxCaption, lightboxCounter, lightboxPrev, lightboxNext, lightboxClose;
+  var lightboxEl, lightboxImg, lightboxTitle, lightboxText, lightboxCounter, lightboxPrev, lightboxNext, lightboxClose;
   var currentImages = [];
   var currentIndex = 0;
 
@@ -20,7 +20,8 @@
     lightboxEl = document.getElementById("lightbox");
     if (!lightboxEl) return;
     lightboxImg = lightboxEl.querySelector(".lightbox-image");
-    lightboxCaption = lightboxEl.querySelector(".lightbox-caption");
+    lightboxTitle = lightboxEl.querySelector(".lightbox-title");
+    lightboxText = lightboxEl.querySelector(".lightbox-text");
     lightboxCounter = lightboxEl.querySelector(".lightbox-counter");
     lightboxPrev = lightboxEl.querySelector(".lightbox-prev");
     lightboxNext = lightboxEl.querySelector(".lightbox-next");
@@ -55,7 +56,11 @@
     var img = currentImages[currentIndex];
     lightboxImg.src = img.src;
     lightboxImg.alt = img.alt || "";
-    lightboxCaption.textContent = img.alt || "";
+    // Title (e.g. Lightroom "Title") as a heading and caption below; a
+    // photo with neither shows its alt text (gallery name - file name).
+    var hasMetadata = img.title || img.caption;
+    lightboxTitle.textContent = img.title || "";
+    lightboxText.textContent = hasMetadata ? img.caption || "" : img.alt || "";
     var multi = currentImages.length > 1;
     if (lightboxCounter) lightboxCounter.textContent = multi ? (currentIndex + 1) + " / " + currentImages.length : "";
     // Warm the cache for the neighbours, so stepping through a big
