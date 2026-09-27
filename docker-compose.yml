@@ -33,6 +33,10 @@ services:
       CAPTCHA_POW_BITS: ${CAPTCHA_POW_BITS:-18}
       # Optional: pin the signing secret of private-gallery access cookies.
       GALLERY_ACCESS_SECRET: ${GALLERY_ACCESS_SECRET:-}
+    labels:
+      gallery.title: "${SITE_TITLE}"
+      gallery.description: "${SITE_DESCRIPTION}"
+      gallery.thumbnail: "${SITE_THUMBNAIL}"
     volumes:
       # External volumes: real directories on the host server, so a
       # photographer can edit YAML / drop in photos without touching
