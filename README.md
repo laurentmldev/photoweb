@@ -46,6 +46,8 @@ data/                  # live site data, git-ignored - same layout as sample/:
     travel.yaml
   photos/
     featured/ weddings/ portraits/ travel/   # actual image files
+  public/
+    thumbnail.jpg        # files served as-is at the site root (see below)
 lib/
   config.js            # loads data/config/site.yaml + generic YAML content loader
   gallery.js            # the reusable "photo gallery" component logic
@@ -99,6 +101,9 @@ or add an entry to `content/galleries.yaml`.
 In `mode: slideshow`, slides advance automatically every `interval`
 seconds (default **3s** if omitted). Hovering the slideshow pauses
 autoplay; arrows and dots are still available and reset the timer.
+Each change is a quick fade-out of the current photo followed by a
+fade-in of the next one (0.3s each, `--slide-fade` in
+`public/css/style.css`).
 
 ### Max display size
 
@@ -169,6 +174,17 @@ title: "Anna & Marc - 14 June"
 - The cookie signing secret is random per server start (customers log in
   again after a restart). Set `GALLERY_ACCESS_SECRET` to pin it.
 
+## Public files (site thumbnail)
+
+Anything placed in `public/` (next to `photos/`) is served as-is at the
+site root: `public/thumbnail.jpg` → `https://<your site>/thumbnail.jpg`.
+That's where the preview picture used by the proxygallery meta-site
+goes: set `SITE_THUMBNAIL` in `.env` to its URL (it ends up in the
+container's `gallery.thumbnail` label). No restart is needed to add or
+replace a file. Directory listings and dotfiles are never served, and a
+file would shadow a page of the same path, so keep extensions on file
+names.
+
 ## Image save protection
 
 On every page, right-click / "Save image as...", dragging images out and
@@ -214,7 +230,7 @@ protection against determined bots, consider adding rate-limiting
 ## Running with Docker Compose
 
 The app is also packaged to run in Docker, with **all editable data —
-site config, page content, gallery definitions and photos — kept in
+site config, page content, gallery definitions, photos and public files — kept in
 external volumes on the host** rather than baked into the image. That
 means updating the site (swap a photo, tweak `site.yaml`, add a
 gallery) never requires rebuilding or redeploying the container.
@@ -234,13 +250,14 @@ What this sets up:
 - **`Dockerfile`** — multi-stage build (Node 20 Alpine). The app code
   (`server.js`, `lib/`, `public/`, `views/`) is baked into the image;
   the sample data (`sample/`) is copied in at `/app/sample`; the live
-  `config/`, `content/`, `galleries/` and `photos/` under `/app/data/`
-  are **not** in the image — those are the four external volumes.
+  `config/`, `content/`, `galleries/`, `photos/` and `public/` under
+  `/app/data/` are **not** in the image — those are the five external volumes.
 - **`docker-compose.yml`** — builds the image and bind-mounts
   `CONFIG_DIR` → `/app/data/config`, `CONTENT_DIR` → `/app/data/content`,
-  `GALLERIES_DIR` → `/app/data/galleries`, `PHOTOS_DIR` → `/app/data/photos` (all
+  `GALLERIES_DIR` → `/app/data/galleries`, `PHOTOS_DIR` → `/app/data/photos`,
+  `PUBLIC_DIR` → `/app/data/public` (all
   overridable via `.env`, defaulting to `./data/*`).
-- **`docker-entrypoint.sh`** — on first run, seeds any of those four
+- **`docker-entrypoint.sh`** — on first run, seeds any of those five
   volumes that's completely empty with the sample config/content/photos
   shipped in the image, so `docker compose up` shows a working site
   immediately on a fresh host. A volume you've already put content into
@@ -252,7 +269,7 @@ What this sets up:
 
 To update the live site's content, just edit files under the host
 directories you pointed `CONFIG_DIR`/`CONTENT_DIR`/`GALLERIES_DIR`/
-`PHOTOS_DIR` at (`config/site.yaml` is re-read on every request; adding
+`PHOTOS_DIR`/`PUBLIC_DIR` at (`config/site.yaml` is re-read on every request; adding
 a gallery or photo needs no restart either — routes read gallery/photo
 folders fresh on each request too). Rebuilding the image
 (`docker compose up -d --build`) is only needed after changing the

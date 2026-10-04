@@ -19,7 +19,7 @@ if [ "$(id -u node)" != "$APP_UID" ] || [ "$(id -g node)" != "$APP_GID" ]; then
   adduser -D -H -u "$APP_UID" -G node node
 fi
 
-# First-run bootstrap: any of the four external volumes that is
+# First-run bootstrap: any of the five external volumes that is
 # completely empty gets seeded with the sample config/content/photos
 # shipped in the image, so the site works out of the box on a fresh
 # host. A volume the operator has already populated (even partially)
@@ -29,7 +29,7 @@ fi
 # like a stray .gitkeep - there only to keep an otherwise-empty
 # directory around in git or in a zip archive - doesn't itself count as
 # real content and block seeding.
-for dir in config content galleries photos; do
+for dir in config content galleries photos public; do
   target="/app/data/$dir"
   seed="/app/sample/$dir"
   if [ -d "$target" ] && [ -z "$(find "$target" -mindepth 1 -not -name '.*' -print -quit 2>/dev/null)" ]; then

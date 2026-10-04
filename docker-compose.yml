@@ -22,7 +22,7 @@ services:
       VIRTUAL_HOST: photo.laurentml.fr
       VIRTUAL_PORT: "4000"
       LETSENCRYPT_HOST: photo.laurentml.fr
-      # Ownership applied inside the container to whatever the four
+      # Ownership applied inside the container to whatever the five
       # volumes below resolve to on the host (see docker-entrypoint.sh).
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
@@ -48,6 +48,9 @@ services:
       - ${CONTENT_DIR:-./data/content}:/app/data/content
       - ${GALLERIES_DIR:-./data/galleries}:/app/data/galleries
       - ${PHOTOS_DIR:-./data/photos}:/app/data/photos
+      # Files served as-is at the site root, e.g. thumbnail.jpg ->
+      # https://photo.laurentml.fr/thumbnail.jpg (SITE_THUMBNAIL above).
+      - ${PUBLIC_DIR:-./data/public}:/app/data/public
 
 networks:
   # Shared with the reverse-proxy stack. Created once, outside of
