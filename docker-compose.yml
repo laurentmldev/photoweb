@@ -48,6 +48,9 @@ services:
       - ${CONTENT_DIR:-./data/content}:/app/data/content
       - ${GALLERIES_DIR:-./data/galleries}:/app/data/galleries
       - ${PHOTOS_DIR:-./data/photos}:/app/data/photos
+      # Files served as-is at the site root, e.g. thumbnail.jpg ->
+      # https://photo.laurentml.fr/thumbnail.jpg (SITE_THUMBNAIL above).
+      - ${PUBLIC_DIR:-./data/public}:/app/data/public
 
 networks:
   # Shared with the reverse-proxy stack. Created once, outside of

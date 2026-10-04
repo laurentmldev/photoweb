@@ -40,7 +40,7 @@ COPY views ./views
 # host operator has already populated is left untouched.
 COPY sample ./sample
 
-RUN mkdir -p /app/data/config /app/data/content /app/data/galleries /app/data/photos
+RUN mkdir -p /app/data/config /app/data/content /app/data/galleries /app/data/photos /app/data/public
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
