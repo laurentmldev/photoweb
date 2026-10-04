@@ -31,6 +31,13 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 // Private galleries' photos are never served here, only through the
 // password-protected /your-photos routes below.
 app.use("/photos", privateGalleries.blockPrivatePhotos, express.static(PHOTOS_ROOT));
+// Public files dropped by the operator into <DATA_DIR>/public, served at
+// the site root: e.g. public/thumbnail.jpg -> /thumbnail.jpg (the preview
+// the proxygallery meta-site shows for this site). Only plain files are
+// served - no directory listings, no dotfiles. A file here would shadow
+// a page at the same path, so keep extensions on names (thumbnail.jpg,
+// not "contact").
+app.use(express.static(path.join(DATA_DIR, "public"), { index: false, dotfiles: "ignore", maxAge: "1h" }));
 
 // Make the (dynamically loaded) global site config available to every view.
 app.use((req, res, next) => {

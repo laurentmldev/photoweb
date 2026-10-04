@@ -118,7 +118,11 @@ main {
 .gallery-empty { color: var(--color-muted); font-style: italic; }
 
 /* ---------- Slideshow mode ---------- */
-.gallery--slideshow { position: relative; }
+.gallery--slideshow {
+  position: relative;
+  /* Duration of each half of a slide change (fade out, then fade in). */
+  --slide-fade: 0.3s;
+}
 .slideshow-viewport {
   position: relative;
   width: 100%;
@@ -142,13 +146,16 @@ main {
      change is delayed until the fade-out has finished. */
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.5s ease, visibility 0s linear 0.5s;
+  /* Fade out: the outgoing slide fades over --slide-fade... */
+  transition: opacity var(--slide-fade) ease-in, visibility 0s linear var(--slide-fade);
 }
 .slideshow-viewport .slide.is-active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transition: opacity 0.5s ease, visibility 0s;
+  /* ...then fade in: the incoming slide waits for the fade-out to end,
+     so the two photos never overlap (out, then in - not a crossfade). */
+  transition: opacity var(--slide-fade) ease-out var(--slide-fade), visibility 0s linear var(--slide-fade);
 }
 .slide-trigger {
   display: block;
