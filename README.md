@@ -51,6 +51,9 @@ data/                  # live site data, git-ignored - same layout as sample/:
 lib/
   config.js            # loads data/config/site.yaml + generic YAML content loader
   gallery.js            # the reusable "photo gallery" component logic
+  admin-auth.js         # admin mode: password, session cookie, CSRF, rate limit
+  admin-routes.js       # admin mode: pages and actions
+  gallery-store.js      # admin mode: reads/writes gallery YAML files and photos
 views/
   partials/gallery.ejs           # gallery component entry point
   partials/gallery-slideshow.ejs # slideshow rendering
@@ -173,6 +176,54 @@ title: "Anna & Marc - 14 June"
   15 minutes).
 - The cookie signing secret is random per server start (customers log in
   again after a restart). Set `GALLERY_ACCESS_SECRET` to pin it.
+
+### Download as a .zip
+
+Add `allowDownload: true` to a private gallery's YAML (or tick the box in
+the admin mode) to show a **Download all photos (.zip)** button on that
+gallery. The zip is streamed on the fly from `photos/<directory>/` (no
+temp file, no recompression) and is only served to a customer who has
+signed in to that gallery.
+
+## Admin mode
+
+A back-office where the photographer creates and manages galleries from a
+browser, instead of editing YAML and copying files by hand.
+
+- **Off by default.** Set `ADMIN_PASSWORD` (at least 10 characters) in `.env`
+  to turn it on. While it's off, the admin URL is an ordinary 404.
+- **No links anywhere.** Nothing on the public site points to it: the
+  photographer types the URL, `/admin` by default. Set `ADMIN_PATH` (e.g.
+  `/atelier-7k2`) to use a less guessable address. Admin pages send
+  `X-Robots-Tag: noindex` and are never cached.
+- **Sign-in = password + human check** (the same distorted-image question
+  and proof-of-work as the contact page). 5 failed attempts per IP lock
+  that IP out for 15 minutes. The session is a signed cookie (4 hours,
+  `SameSite=Strict`, limited to `ADMIN_PATH`); changing `ADMIN_PASSWORD`
+  signs every session out. Every form also carries a CSRF token.
+
+What it does:
+
+| Page | |
+|---|---|
+| Dashboard | Every gallery with its visibility, photo count and where it's shown (Galleries page, Home page, Your Photos). ↑/↓ reorders the Galleries page. |
+| New gallery | Name (= photo folder, and the gallery name a customer types for a private one), title, description, public/private, customer password, zip download, display mode, slideshow interval, max width/height, show on the Galleries page + its `/galleries/<address>`. |
+| Edit gallery | The same settings, plus photo upload (multiple files, drag & drop, progress bar), photo grid with select/delete, and delete gallery (optionally with its photo folder). |
+
+It writes the same files you would edit by hand: `galleries/<name>.yaml`,
+`photos/<name>/` and the list in `content/galleries.yaml`. Hand edits keep
+working; note that saving a gallery from the admin rewrites its YAML file
+without the comments. A gallery shown on the Home page (or another content
+page) can't be made private or deleted from the admin. Uploads accept the
+supported image extensions only, up to `ADMIN_MAX_UPLOAD_MB` (default 50)
+per file, and never overwrite a photo with the same name (a `-2` suffix is
+added). Photos are shown in file-name order.
+
+With Docker, the `galleries/`, `photos/` and `content/` volumes must be
+writable by `PUID`/`PGID` (the entrypoint already `chown`s them).
+If the site sits behind nginx, raise its upload limit for the admin path,
+e.g. `client_max_body_size 500m;` (nginx-proxy: a `vhost.d/<VIRTUAL_HOST>`
+file with that line), or larger photo batches will be refused with a 413.
 
 ## Public files (site thumbnail)
 

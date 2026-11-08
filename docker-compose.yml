@@ -33,6 +33,11 @@ services:
       CAPTCHA_POW_BITS: ${CAPTCHA_POW_BITS:-18}
       # Optional: pin the signing secret of private-gallery access cookies.
       GALLERY_ACCESS_SECRET: ${GALLERY_ACCESS_SECRET:-}
+      # Admin mode (off unless ADMIN_PASSWORD is set) - see .env.example.
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_PATH: ${ADMIN_PATH:-/admin}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
+      ADMIN_MAX_UPLOAD_MB: ${ADMIN_MAX_UPLOAD_MB:-50}
     labels:
       gallery.title: "${SITE_TITLE}"
       gallery.description: "${SITE_DESCRIPTION}"

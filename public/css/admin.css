@@ -1,0 +1,92 @@
+/* ---------- Admin mode (only loaded by views/admin/*) ---------- */
+body.admin { background: #faf9f7; }
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.9rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--color-primary);
+  color: var(--color-secondary);
+}
+.admin-brand { color: inherit; text-decoration: none; font-weight: 600; letter-spacing: 0.02em; }
+.admin-nav { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+.admin-nav a, .admin-nav .link-button { color: var(--color-secondary); opacity: 0.85; text-decoration: none; font-size: 0.92rem; }
+.admin-nav a:hover, .admin-nav .link-button:hover { opacity: 1; color: var(--color-accent); }
+.admin-nav form { margin: 0; }
+.admin-main { max-width: 1100px; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 2.5rem) 4rem; }
+.admin-main h1 { margin: 0.25rem 0 1rem; }
+.admin-main h2 { font-size: 1.25rem; margin: 0 0 1rem; }
+.admin-title-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.admin-login { margin: 2rem auto; }
+
+.admin-flash { padding: 0.7rem 1rem; border-radius: 4px; margin: 0 0 1.25rem; font-size: 0.95rem; }
+ul.admin-flash { padding-left: 2rem; }
+.admin-flash--ok { background: #e7f3ea; color: #1d5a2c; }
+.admin-flash--error { background: #fbeaea; color: #8c1d18; }
+
+.admin-sub { color: var(--color-muted); font-size: 0.85rem; }
+.admin-help { color: var(--color-muted); font-size: 0.85rem; margin: 0.2rem 0 0.4rem; }
+
+/* Dashboard table */
+.admin-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--color-border); }
+.admin-table th, .admin-table td { padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: top; }
+.admin-table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); font-weight: 500; }
+.admin-gallery-link { font-weight: 600; color: var(--color-primary); }
+.admin-col-order { width: 1%; white-space: nowrap; }
+.admin-inline { display: inline-flex; gap: 0.25rem; margin: 0; }
+.admin-icon-btn { border: 1px solid var(--color-border); background: #fff; border-radius: 4px; width: 2rem; height: 2rem; cursor: pointer; font: inherit; }
+.admin-icon-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.admin-badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.78rem; background: var(--color-border); margin-right: 0.25rem; }
+.admin-badge--public { background: #e7f3ea; color: #1d5a2c; }
+.admin-badge--private { background: #f3ecdf; color: #6b4c16; }
+.admin-badge--error { background: #fbeaea; color: #8c1d18; }
+
+@media (max-width: 700px) {
+  .admin-table thead { display: none; }
+  .admin-table tr { display: block; border-bottom: 1px solid var(--color-border); padding: 0.5rem 0; }
+  .admin-table td { display: block; border: none; padding: 0.2rem 0.8rem; }
+}
+
+/* Cards & forms */
+.admin-card { background: #fff; border: 1px solid var(--color-border); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+.admin-card--danger { border-color: #e8c4c2; }
+.admin-form { display: flex; flex-direction: column; gap: 0.35rem; max-width: 640px; }
+.admin-form label { font-size: 0.92rem; margin-top: 0.5rem; }
+.admin-form input[type="text"], .admin-form input:not([type]), .admin-form input[type="number"], .admin-form textarea {
+  padding: 0.55rem 0.7rem; border: 1px solid var(--color-border); border-radius: 4px; font: inherit; background: #fff; width: 100%; box-sizing: border-box;
+}
+.admin-form textarea { resize: vertical; }
+.admin-form fieldset { border: 1px solid var(--color-border); border-radius: 4px; padding: 0.5rem 1rem 1rem; margin: 0.75rem 0 0; }
+.admin-form legend { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); padding: 0 0.3rem; }
+.admin-form .button { margin-top: 1rem; }
+.admin-radio, .admin-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.admin-prefixed { display: flex; align-items: stretch; }
+.admin-prefixed span { padding: 0.55rem 0.6rem; background: var(--color-border); border-radius: 4px 0 0 4px; font-size: 0.9rem; color: var(--color-muted); }
+.admin-prefixed input { border-radius: 0 4px 4px 0 !important; }
+.admin-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0 1rem; }
+.admin-grid-3 > div { display: flex; flex-direction: column; gap: 0.35rem; }
+[hidden] { display: none !important; }
+
+.admin-danger-btn { background: #fff; color: #8c1d18; border: 1px solid #d9a3a0; border-radius: 4px; padding: 0.5rem 1rem; font: inherit; font-size: 0.92rem; cursor: pointer; }
+.admin-danger-btn:hover { background: #8c1d18; color: #fff; }
+
+/* Upload */
+.admin-dropzone {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  border: 2px dashed var(--color-border); border-radius: 6px; padding: 1.25rem; cursor: pointer;
+}
+.admin-dropzone.is-dragover { border-color: var(--color-accent); background: #fdfaf4; }
+.admin-upload-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 0.75rem; }
+.admin-upload-info { color: var(--color-muted); font-size: 0.9rem; }
+.admin-progress { width: 100%; margin-top: 0.5rem; }
+
+/* Photo grid */
+.admin-photo-toolbar { display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0 0.75rem; }
+.admin-photo-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+.admin-photo-grid label { display: flex; flex-direction: column; gap: 0.25rem; position: relative; cursor: pointer; }
+.admin-photo-grid input[type="checkbox"] { position: absolute; top: 0.4rem; left: 0.4rem; width: 1.1rem; height: 1.1rem; }
+.admin-photo-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--color-border); border-radius: 4px; border: 2px solid transparent; }
+.admin-photo-grid input:checked ~ img { border-color: #b3261e; opacity: 0.7; }
+.admin-photo-name { font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

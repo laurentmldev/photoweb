@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="<%= siteConfig.site.language %>">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title><%= page.title %> — Admin — <%= siteConfig.site.title %></title>
+  <link rel="stylesheet" href="/public/css/style.css" />
+  <link rel="stylesheet" href="/public/css/admin.css" />
+  <%
+  const css = (v) => String(v == null ? '' : v).replace(/[<>{};]/g, '');
+  %>
+  <style>
+    :root {
+      --color-primary: <%- css(siteConfig.theme.primaryColor) %>;
+      --color-secondary: <%- css(siteConfig.theme.secondaryColor) %>;
+      --color-accent: <%- css(siteConfig.theme.accentColor) %>;
+      --color-muted: <%- css(siteConfig.theme.mutedColor) %>;
+      --color-border: <%- css(siteConfig.theme.borderColor) %>;
+      --font-heading: <%- css(siteConfig.theme.headingFont) %>;
+      --font-body: <%- css(siteConfig.theme.bodyFont) %>;
+    }
+  </style>
+</head>
+<body class="admin">
+  <header class="admin-header">
+    <a class="admin-brand" href="<%= adminUrl('/') %>"><%= siteConfig.site.title %> · Admin</a>
+    <% if (typeof csrfToken !== 'undefined') { %>
+      <nav class="admin-nav">
+        <a href="<%= adminUrl('/') %>">Galleries</a>
+        <a href="<%= adminUrl('/galleries/new') %>">New gallery</a>
+        <a href="/" target="_blank" rel="noopener">View site ↗</a>
+        <form method="POST" action="<%= adminUrl('/logout') %>">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button type="submit" class="link-button">Sign out</button>
+        </form>
+      </nav>
+    <% } %>
+  </header>
+  <main class="admin-main">
+    <% if (notice) { %><p class="admin-flash admin-flash--ok" role="status"><%= notice %></p><% } %>
+    <% if (errorNotice) { %><p class="admin-flash admin-flash--error" role="alert"><%= errorNotice %></p><% } %>

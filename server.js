@@ -7,6 +7,9 @@ const { loadGallery, PHOTOS_ROOT, IMAGE_EXTENSIONS } = require("./lib/gallery");
 const privateGalleries = require("./lib/private-galleries");
 const { createChallenge, verifyChallenge } = require("./lib/captcha");
 const { renderQuestionImage } = require("./lib/captcha-image");
+const adminAuth = require("./lib/admin-auth");
+const { createAdminRouter } = require("./lib/admin-routes");
+const archiver = require("archiver");
 
 // Builds the view-ready challenge object: the signed token/difficulty
 // from lib/captcha, plus the distorted question image rendered from its
@@ -51,6 +54,17 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// ---------------------------------------------------------------------
+// Admin mode (lib/admin-routes.js): only when ADMIN_PASSWORD is set, at
+// ADMIN_PATH (default /admin). Deliberately not linked from anywhere on
+// the site - the photographer types the URL. When disabled, the path is
+// just an unknown page (404).
+// ---------------------------------------------------------------------
+if (adminAuth.isEnabled()) {
+  app.use(adminAuth.ADMIN_PATH, createAdminRouter());
+  console.log(`[admin] admin mode enabled at ${adminAuth.ADMIN_PATH}`);
+}
 
 // ---------------------------------------------------------------------
 // Home page: a single slideshow gallery
@@ -197,7 +211,54 @@ app.get("/your-photos/:directory", async (req, res, next) => {
       urlPrefix: `${privateGalleryUrl(gallery)}/photos`,
     });
     res.set("Cache-Control", "private, no-store");
-    res.render("private-gallery", { page: loaded, gallery: loaded });
+    res.render("private-gallery", {
+      page: loaded,
+      gallery: loaded,
+      downloadUrl: loaded.allowDownload && loaded.images.length ? `${privateGalleryUrl(gallery)}/download` : null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Whole private gallery as one .zip, when its YAML sets allowDownload: true.
+// Streamed (nothing buffered or written to disk) and stored without
+// recompression, since photos are already compressed.
+app.get("/your-photos/:directory/download", async (req, res, next) => {
+  try {
+    const gallery = privateGalleries.findPrivateGallery(req.params.directory);
+    if (!gallery || !privateGalleries.hasAccess(req, gallery)) {
+      res.redirect(303, "/your-photos");
+      return;
+    }
+    const loaded = await loadGallery(gallery.configPath);
+    if (!loaded.allowDownload) {
+      res.sendStatus(404);
+      return;
+    }
+    const dir = path.join(PHOTOS_ROOT, gallery.directory);
+    const files = fs
+      .readdirSync(dir)
+      .filter((f) => !f.startsWith(".") && IMAGE_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .sort();
+    const zipName = `${gallery.directory.replace(/[^A-Za-z0-9._-]+/g, "-") || "photos"}.zip`;
+    res.set({
+      "Content-Type": "application/zip",
+      "Content-Disposition": `attachment; filename="${zipName}"`,
+      "Cache-Control": "private, no-store",
+    });
+    const archive = archiver("zip", { store: true });
+    archive.on("warning", (err) => console.warn("[zip]", err));
+    archive.on("error", (err) => {
+      console.error("[zip]", err);
+      res.destroy(err);
+    });
+    res.on("close", () => {
+      if (!res.writableFinished) archive.abort();
+    });
+    archive.pipe(res);
+    for (const file of files) archive.file(path.join(dir, file), { name: file });
+    archive.finalize();
   } catch (err) {
     next(err);
   }

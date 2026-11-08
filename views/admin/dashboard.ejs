@@ -1,0 +1,63 @@
+<%- include('layout-top') %>
+
+<div class="admin-title-row">
+  <h1>Galleries</h1>
+  <a class="button" href="<%= adminUrl('/galleries/new') %>">+ New gallery</a>
+</div>
+
+<% if (galleries.length === 0) { %>
+  <p>No gallery yet.</p>
+<% } else { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Gallery</th>
+        <th>Visibility</th>
+        <th>Photos</th>
+        <th>Shown on</th>
+        <th class="admin-col-order">Order</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% galleries.forEach(function(g) { %>
+        <tr>
+          <td>
+            <a class="admin-gallery-link" href="<%= galleryUrl(g.id) %>"><%= g.config.title || g.id %></a>
+            <div class="admin-sub">
+              folder <code>photos/<%= g.config.directory || '?' %></code>
+              <% if (g.error) { %><span class="admin-badge admin-badge--error">file error</span><% } %>
+            </div>
+          </td>
+          <td>
+            <% if (g.isPrivate) { %>
+              <span class="admin-badge admin-badge--private">Private</span>
+              <% if (g.config.allowDownload) { %><span class="admin-badge">zip</span><% } %>
+            <% } else { %>
+              <span class="admin-badge admin-badge--public">Public</span>
+            <% } %>
+          </td>
+          <td><%= g.photoCount %></td>
+          <td class="admin-sub">
+            <% const shown = []; %>
+            <% if (g.isPrivate) shown.push('Your Photos'); %>
+            <% if (g.listed && !g.isPrivate) shown.push('/galleries/' + g.slug); %>
+            <% g.usedBy.forEach(function(p) { shown.push(p === 'home' ? 'Home page' : '/' + p); }); %>
+            <%= shown.length ? shown.join(', ') : '— (not shown)' %>
+          </td>
+          <td class="admin-col-order">
+            <% if (g.listed && !g.isPrivate) { %>
+              <form method="POST" action="<%= galleryUrl(g.id, '/move') %>" class="admin-inline">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit" name="direction" value="up" class="admin-icon-btn" title="Move up on the Galleries page">↑</button>
+                <button type="submit" name="direction" value="down" class="admin-icon-btn" title="Move down on the Galleries page">↓</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <p class="admin-sub">Public galleries appear on the Galleries page in the order above. Private galleries are only reachable through <em>Your Photos</em> with their name and password.</p>
+<% } %>
+
+<%- include('layout-bottom') %>

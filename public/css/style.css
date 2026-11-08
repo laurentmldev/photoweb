@@ -343,6 +343,9 @@ main {
   margin-bottom: 1.5rem;
 }
 .private-gallery-bar .back-link { margin-bottom: 0; }
+.private-gallery-actions { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; justify-content: flex-end; }
+.private-gallery-actions form { margin: 0; }
+.private-gallery-actions .button { text-decoration: none; }
 
 /* ---------- Human check (self-hosted captcha) ---------- */
 .human-check {

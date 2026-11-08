@@ -1,0 +1,28 @@
+<%- include('layout-top') %>
+
+<section class="admin-login private-login">
+  <h1>Sign in</h1>
+  <% if (error) { %><p class="private-login-error" role="alert"><%= error %></p><% } %>
+  <form
+    class="human-check-form"
+    method="POST"
+    action="<%= adminUrl('/login') %>"
+    data-pow-token="<%= challenge.token %>"
+    data-pow-difficulty="<%= challenge.difficulty %>"
+  >
+    <label for="admin-password">Admin password</label>
+    <input type="password" id="admin-password" name="password" required autocomplete="current-password" autofocus />
+    <div class="private-login-check">
+      <%- include('../partials/human-check-question', { challenge: challenge }) %>
+      <div class="human-check-row">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="captcha-answer" name="answer" required autocomplete="off" />
+        <button type="submit" disabled>Sign in</button>
+      </div>
+      <p class="pow-status" role="status">Preparing verification…</p>
+    </div>
+  </form>
+</section>
+
+<script src="/public/js/captcha-pow.js"></script>
+
+<%- include('layout-bottom') %>

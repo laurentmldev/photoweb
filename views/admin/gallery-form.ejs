@@ -1,0 +1,150 @@
+<%- include('layout-top') %>
+
+<a class="back-link" href="<%= adminUrl('/') %>">&larr; All galleries</a>
+
+<div class="admin-title-row">
+  <h1><%= isNew ? 'New gallery' : (gallery.config.title || gallery.id) %></h1>
+  <% if (!isNew) { %>
+    <% if (gallery.isPrivate) { %>
+      <a class="link-button" href="/your-photos" target="_blank" rel="noopener">Customer login page ↗</a>
+    <% } else if (gallery.listed) { %>
+      <a class="link-button" href="/galleries/<%= gallery.slug %>" target="_blank" rel="noopener">View on site ↗</a>
+    <% } %>
+  <% } %>
+</div>
+
+<% if (errors.length) { %>
+  <ul class="admin-flash admin-flash--error" role="alert">
+    <% errors.forEach(function(e) { %><li><%= e %></li><% }); %>
+  </ul>
+<% } %>
+
+<!-- ================= Settings ================= -->
+<section class="admin-card">
+  <h2>Settings</h2>
+  <form method="POST" action="<%= isNew ? adminUrl('/galleries') : galleryUrl(gallery.id) %>" class="admin-form" id="gallery-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <% if (isNew) { %>
+      <label for="f-name">Name</label>
+      <input id="f-name" name="name" value="<%= values.name %>" required pattern="[a-z0-9][a-z0-9_\-]*" maxlength="64" autocapitalize="none" spellcheck="false" placeholder="e.g. smith-wedding" />
+      <p class="admin-help">Lowercase letters, digits, - and _. Used for the photo folder and the gallery's address. For a private gallery, it's also the <strong>gallery name your customer types</strong>. Can't be changed later.</p>
+    <% } else { %>
+      <p class="admin-help">Name / photo folder: <code><%= gallery.id %></code> → <code>photos/<%= gallery.config.directory %></code></p>
+    <% } %>
+
+    <label for="f-title">Title</label>
+    <input id="f-title" name="title" value="<%= values.title %>" required maxlength="200" />
+
+    <label for="f-description">Description</label>
+    <textarea id="f-description" name="description" rows="3" maxlength="2000"><%= values.description %></textarea>
+
+    <fieldset>
+      <legend>Visibility</legend>
+      <label class="admin-radio"><input type="radio" name="visibility" value="public" <%= values.visibility === 'public' ? 'checked' : '' %> /> Public</label>
+      <label class="admin-radio"><input type="radio" name="visibility" value="private" <%= values.visibility === 'private' ? 'checked' : '' %> /> Private (customer gallery, password protected)</label>
+
+      <div class="admin-when-public">
+        <label class="admin-check"><input type="checkbox" name="listed" <%= values.listed ? 'checked' : '' %> /> Show on the Galleries page</label>
+        <label for="f-slug">Page address</label>
+        <div class="admin-prefixed"><span>/galleries/</span><input id="f-slug" name="slug" value="<%= values.slug %>" maxlength="64" autocapitalize="none" spellcheck="false" placeholder="same as name" /></div>
+      </div>
+
+      <div class="admin-when-private">
+        <label for="f-password">Customer password</label>
+        <input id="f-password" name="password" type="text" value="<%= values.password %>" maxlength="200" autocomplete="off" spellcheck="false" />
+        <p class="admin-help">Give your customer the gallery name and this password. Changing it signs out everyone who had opened the gallery.</p>
+        <label class="admin-check"><input type="checkbox" name="allowDownload" <%= values.allowDownload ? 'checked' : '' %> /> Offer a “Download all photos (.zip)” button</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Display</legend>
+      <label class="admin-radio"><input type="radio" name="mode" value="thumbnails" <%= values.mode !== 'slideshow' ? 'checked' : '' %> /> Thumbnail grid</label>
+      <label class="admin-radio"><input type="radio" name="mode" value="slideshow" <%= values.mode === 'slideshow' ? 'checked' : '' %> /> Slideshow</label>
+      <div class="admin-grid-3">
+        <div>
+          <label for="f-interval">Slideshow interval (s)</label>
+          <input id="f-interval" name="interval" type="number" min="0.5" step="0.5" value="<%= values.interval %>" placeholder="3" />
+        </div>
+        <div>
+          <label for="f-maxw">Max width (px)</label>
+          <input id="f-maxw" name="maxWidth" type="number" min="1" step="1" value="<%= values.maxWidth %>" placeholder="none" />
+        </div>
+        <div>
+          <label for="f-maxh">Max height (px)</label>
+          <input id="f-maxh" name="maxHeight" type="number" min="1" step="1" value="<%= values.maxHeight %>" placeholder="none" />
+        </div>
+      </div>
+    </fieldset>
+
+    <% if (!isNew && gallery.usedBy.length) { %>
+      <p class="admin-help">Also shown on: <%= gallery.usedBy.map(function(p){ return p === 'home' ? 'Home page' : '/' + p; }).join(', ') %> (so it must stay public).</p>
+    <% } %>
+
+    <div><button type="submit" class="button"><%= isNew ? 'Create gallery' : 'Save settings' %></button></div>
+  </form>
+</section>
+
+<% if (!isNew) { %>
+<!-- ================= Photos ================= -->
+<section class="admin-card" id="photos">
+  <h2>Photos <span class="admin-sub">(<%= photos.length %>)</span></h2>
+
+  <form method="POST" enctype="multipart/form-data" action="<%= galleryUrl(gallery.id, '/photos') %>?_csrf=<%= encodeURIComponent(csrfToken) %>" class="admin-upload" id="upload-form">
+    <label for="f-photos" class="admin-dropzone">
+      <strong>Add photos</strong>
+      <span>Choose files, or drop them here.</span>
+      <span class="admin-help">JPG, PNG, WebP, GIF, SVG · up to <%= maxUploadMb %> MB each. Photos are shown sorted by file name; titles and captions come from the photo's own metadata (e.g. Lightroom).</span>
+      <input id="f-photos" type="file" name="photos" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" multiple required />
+    </label>
+    <div class="admin-upload-row">
+      <span class="admin-upload-info" aria-live="polite"></span>
+      <button type="submit" class="button">Upload</button>
+    </div>
+    <progress class="admin-progress" max="100" value="0" hidden></progress>
+  </form>
+
+  <% if (photos.length) { %>
+    <form method="POST" action="<%= galleryUrl(gallery.id, '/photos/delete') %>" id="photos-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="admin-photo-toolbar">
+        <label class="admin-check"><input type="checkbox" id="select-all" /> Select all</label>
+        <button type="submit" class="admin-danger-btn" data-confirm="Delete the selected photos? This can't be undone.">Delete selected</button>
+      </div>
+      <ul class="admin-photo-grid">
+        <% photos.forEach(function(p) { %>
+          <li>
+            <label>
+              <input type="checkbox" name="photo" value="<%= p.name %>" />
+              <img src="<%= galleryUrl(gallery.id, '/photos/' + encodeURIComponent(p.name)) %>" alt="" loading="lazy" />
+              <span class="admin-photo-name" title="<%= p.name %>"><%= p.name %></span>
+              <span class="admin-sub"><%= (p.size / 1048576).toFixed(1) %> MB</span>
+            </label>
+          </li>
+        <% }); %>
+      </ul>
+    </form>
+  <% } %>
+</section>
+
+<!-- ================= Delete ================= -->
+<section class="admin-card admin-card--danger">
+  <h2>Delete this gallery</h2>
+  <% if (gallery.usedBy.length) { %>
+    <p class="admin-help">It's shown on <%= gallery.usedBy.map(function(p){ return p === 'home' ? 'the Home page' : '/' + p; }).join(', ') %>, so it can't be deleted from here.</p>
+  <% } else { %>
+    <form method="POST" action="<%= galleryUrl(gallery.id, '/delete') %>" class="admin-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <label class="admin-check"><input type="checkbox" name="deletePhotos" /> Also delete its photo folder <code>photos/<%= gallery.config.directory %></code> and every photo in it</label>
+      <label for="f-confirm">Type <code><%= gallery.id %></code> to confirm</label>
+      <input id="f-confirm" name="confirm" required autocomplete="off" autocapitalize="none" spellcheck="false" />
+      <div><button type="submit" class="admin-danger-btn">Delete gallery</button></div>
+    </form>
+  <% } %>
+</section>
+<% } %>
+
+<script src="/public/js/admin.js"></script>
+
+<%- include('layout-bottom') %>

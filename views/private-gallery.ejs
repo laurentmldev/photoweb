@@ -2,9 +2,14 @@
 
 <div class="private-gallery-bar">
   <a class="back-link" href="/galleries">&larr; All galleries</a>
-  <form method="POST" action="/your-photos/logout">
-    <button type="submit" class="link-button">Sign out</button>
-  </form>
+  <div class="private-gallery-actions">
+    <% if (downloadUrl) { %>
+      <a class="button" href="<%= downloadUrl %>" download>Download all photos (.zip)</a>
+    <% } %>
+    <form method="POST" action="/your-photos/logout">
+      <button type="submit" class="link-button">Sign out</button>
+    </form>
+  </div>
 </div>
 
 <%- include('partials/gallery', { gallery: gallery, idPrefix: 'private-gallery' }) %>
