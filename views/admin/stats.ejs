@@ -1,0 +1,114 @@
+<%- include('layout-top') %>
+<%
+// Averages: one decimal below 10. Counts: whole numbers.
+const avg = (n) => n >= 10 || n === 0 ? Math.round(n).toLocaleString('en') : n.toFixed(1);
+const fmt = (n) => Math.round(n).toLocaleString('en');
+const firstDate = new Date(summary.firstDay + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const maxDaily = Math.max(1, ...summary.daily.map((d) => d.visitors));
+const kindLabel = { page: 'Page', public: 'Gallery', private: 'Private gallery' };
+%>
+
+<div class="admin-title-row">
+  <h1>Stats</h1>
+  <p class="admin-sub">Counting since <%= firstDate %> · <%= summary.visitorsToday %> visitor<%= summary.visitorsToday === 1 ? '' : 's' %> today</p>
+</div>
+
+<!-- Global -->
+<div class="stats-cards">
+  <% summary.periods.forEach(function(p) { %>
+    <div class="stats-card">
+      <p class="stats-card-label"><%= p.label %></p>
+      <p class="stats-card-value"><%= avg(p.avgVisitors) %></p>
+      <p class="admin-sub">visitors per day on average</p>
+      <p class="stats-card-line"><strong><%= fmt(p.views) %></strong> page views · <strong><%= fmt(p.downloads) %></strong> download<%= p.downloads === 1 ? '' : 's' %></p>
+      <% if (p.daysCounted < p.days) { %><p class="admin-sub">over <%= p.daysCounted %> day<%= p.daysCounted === 1 ? '' : 's' %> of data so far</p><% } %>
+    </div>
+  <% }); %>
+  <div class="stats-card stats-card--accent">
+    <p class="stats-card-label">Downloads, all time</p>
+    <p class="stats-card-value"><%= fmt(summary.downloadsAllTime) %></p>
+    <p class="admin-sub">zip downloads of private galleries</p>
+  </div>
+</div>
+
+<!-- Last 30 days -->
+<section class="admin-card">
+  <h2>Daily visitors, last 30 days</h2>
+  <div class="stats-chart" role="img" aria-label="Bar chart of daily unique visitors over the last 30 days">
+    <% summary.daily.forEach(function(d) { %>
+      <div class="stats-bar" title="<%= d.day %>: <%= d.visitors %> visitors, <%= d.views %> page views">
+        <span class="stats-bar-fill" style="height: <%= (d.visitors / maxDaily * 100).toFixed(1) %>%"></span>
+      </div>
+    <% }); %>
+  </div>
+  <div class="stats-chart-axis admin-sub">
+    <span><%= summary.daily[0].day.slice(5).split('-').reverse().join('/') %></span>
+    <span>max <%= maxDaily %> / day</span>
+    <span>today</span>
+  </div>
+</section>
+
+<!-- Per page / gallery -->
+<section class="admin-card">
+  <h2>By page and gallery</h2>
+  <% if (!rows.length) { %>
+    <p class="admin-sub">No visits counted yet.</p>
+  <% } else { %>
+    <table class="admin-table stats-table">
+      <thead>
+        <tr>
+          <th>Page</th>
+          <th class="num">Week<br><span>visitors/day</span></th>
+          <th class="num">Month<br><span>visitors/day</span></th>
+          <th class="num">Year<br><span>visitors/day</span></th>
+          <th class="num">Page views<br><span>week · month · year</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(function(r) { %>
+          <tr>
+            <td>
+              <strong><%= r.name %></strong>
+              <div class="admin-sub"><span class="admin-badge <%= r.kind === 'private' ? 'admin-badge--private' : r.kind === 'public' ? 'admin-badge--public' : '' %>"><%= kindLabel[r.kind] %></span> <code><%= r.key %></code></div>
+            </td>
+            <td class="num" data-label="Week"><%= avg(r.week.avgVisitors) %></td>
+            <td class="num" data-label="Month"><%= avg(r.month.avgVisitors) %></td>
+            <td class="num" data-label="Year"><%= avg(r.year.avgVisitors) %></td>
+            <td class="num" data-label="Views"><%= fmt(r.week.views) %> · <%= fmt(r.month.views) %> · <%= fmt(r.year.views) %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</section>
+
+<!-- Downloads -->
+<section class="admin-card">
+  <h2>Downloads by gallery</h2>
+  <% if (!downloads.length) { %>
+    <p class="admin-sub">No zip download yet. Downloads are offered on private galleries with “Download all photos (.zip)” ticked.</p>
+  <% } else { %>
+    <table class="admin-table stats-table">
+      <thead>
+        <tr><th>Gallery</th><th class="num">Week</th><th class="num">Month</th><th class="num">Year</th><th class="num">All time</th></tr>
+      </thead>
+      <tbody>
+        <% downloads.forEach(function(d) { %>
+          <tr>
+            <td><strong><%= d.name %></strong></td>
+            <td class="num" data-label="Week"><%= d.week %></td>
+            <td class="num" data-label="Month"><%= d.month %></td>
+            <td class="num" data-label="Year"><%= d.year %></td>
+            <td class="num" data-label="All time"><strong><%= d.allTime %></strong></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+</section>
+
+<p class="admin-sub">
+  A visitor is one person (same network address and browser) on one day, recognised without cookies and without storing addresses: “visitors/day” is the average of daily counts over the period, today included. Search-engine robots and link previews are not counted, nor are admin pages. Week = 7 days, month = 30, year = 365. Times in <%= summary.timezone %>.
+</p>
+
+<%- include('layout-bottom') %>

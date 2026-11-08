@@ -27,8 +27,8 @@
     <a class="admin-brand" href="<%= adminUrl('/') %>"><%= siteConfig.site.title %> · Admin</a>
     <% if (typeof csrfToken !== 'undefined') { %>
       <nav class="admin-nav">
-        <a href="<%= adminUrl('/') %>">Galleries</a>
-        <a href="<%= adminUrl('/galleries/new') %>">New gallery</a>
+        <a href="<%= adminUrl('/') %>" class="<%= page.title !== 'Stats' ? 'active' : '' %>">Galleries</a>
+        <a href="<%= adminUrl('/stats') %>" class="<%= page.title === 'Stats' ? 'active' : '' %>">Stats</a>
         <a href="/" target="_blank" rel="noopener">View site ↗</a>
         <form method="POST" action="<%= adminUrl('/logout') %>">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>" />

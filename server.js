@@ -10,6 +10,7 @@ const { renderQuestionImage } = require("./lib/captcha-image");
 const adminAuth = require("./lib/admin-auth");
 const { createAdminRouter } = require("./lib/admin-routes");
 const archiver = require("archiver");
+const stats = require("./lib/stats");
 
 // Builds the view-ready challenge object: the signed token/difficulty
 // from lib/captcha, plus the distorted question image rendered from its
@@ -52,6 +53,21 @@ app.use((req, res, next) => {
     next(err);
     return;
   }
+  next();
+});
+
+// Visit statistics (lib/stats.js, shown in the admin's Stats tab): every
+// public page successfully rendered for a GET counts as a view of its
+// path. Admin pages, errors and 404s are not counted.
+const COUNTED_VIEWS = new Set(["home", "galleries", "gallery", "page", "contact", "your-photos", "private-gallery"]);
+app.use((req, res, next) => {
+  const render = res.render;
+  res.render = function (view, ...args) {
+    if (COUNTED_VIEWS.has(view) && req.method === "GET" && res.statusCode === 200) {
+      stats.recordView(req, req.path.toLowerCase().replace(/\/+$/, "") || "/");
+    }
+    return render.call(this, view, ...args);
+  };
   next();
 });
 
@@ -257,6 +273,7 @@ app.get("/your-photos/:directory/download", async (req, res, next) => {
       if (!res.writableFinished) archive.abort();
     });
     archive.pipe(res);
+    stats.recordDownload(req, gallery.directory.toLowerCase());
     for (const file of files) archive.file(path.join(dir, file), { name: file });
     archive.finalize();
   } catch (err) {
@@ -371,6 +388,16 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   res.status(500).send(`<pre>Server error: ${err.message}</pre>`);
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Photographer site running at http://localhost:${PORT}`);
 });
+
+// `docker compose stop/down` sends SIGTERM: save the statistics, then
+// stop. (As PID 1 in the container, node has no default handler.)
+for (const signal of ["SIGTERM", "SIGINT"]) {
+  process.on(signal, () => {
+    stats.flush();
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 3000).unref();
+  });
+}

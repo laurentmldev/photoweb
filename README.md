@@ -54,6 +54,7 @@ lib/
   admin-auth.js         # admin mode: password, session cookie, CSRF, rate limit
   admin-routes.js       # admin mode: pages and actions
   gallery-store.js      # admin mode: reads/writes gallery YAML files and photos
+  stats.js              # visit/download statistics (admin Stats tab)
 views/
   partials/gallery.ejs           # gallery component entry point
   partials/gallery-slideshow.ejs # slideshow rendering
@@ -244,6 +245,26 @@ limit is 1 MB, which refuses almost any real photo (the admin then shows
 above `ADMIN_MAX_UPLOAD_MB`, e.g. `client_max_body_size 60m;` (nginx-proxy:
 in the `vhost.d/<VIRTUAL_HOST>` file).
 
+### Stats tab
+
+The admin mode's **Stats** tab shows, for the past week (7 days), month (30)
+and year (365), today included:
+
+- average **daily unique visitors** and page views for the whole site,
+- the same **per page and per gallery** (Home, Galleries, each public
+  gallery, Contact, each private gallery, extra content pages),
+- **zip downloads** per private gallery, plus the all-time total,
+- a bar chart of daily visitors over the last 30 days.
+
+Counting is done by the site itself (`lib/stats.js`), with no cookie, no
+third-party service and no stored IP address: within one day a visitor is
+recognised by a hash of a random salt + IP + browser, and the salt is
+replaced every day, so only daily counts remain afterwards. Robots, link
+previews, admin pages and error pages are not counted. Data lives in
+`stats/` next to the other data folders (`STATS_DIR` volume with Docker),
+about 400 days of daily counts; `STATS_TIMEZONE` (default `Europe/Paris`)
+decides where a day starts. Counting starts when this version is deployed.
+
 ## Public files (site thumbnail)
 
 Anything placed in `public/` (next to `photos/`) is served as-is at the
@@ -325,7 +346,8 @@ What this sets up:
 - **`docker-compose.yml`** — builds the image and bind-mounts
   `CONFIG_DIR` → `/app/data/config`, `CONTENT_DIR` → `/app/data/content`,
   `GALLERIES_DIR` → `/app/data/galleries`, `PHOTOS_DIR` → `/app/data/photos`,
-  `PUBLIC_DIR` → `/app/data/public` (all
+  `PUBLIC_DIR` → `/app/data/public`, plus `STATS_DIR` → `/app/data/stats`
+  where the app saves its statistics (all
   overridable via `.env`, defaulting to `./data/*`).
 - **`docker-entrypoint.sh`** — on first run, seeds any of those five
   volumes that's completely empty with the sample config/content/photos

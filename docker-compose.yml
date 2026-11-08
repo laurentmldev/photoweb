@@ -39,6 +39,8 @@ services:
       ADMIN_PATH: ${ADMIN_PATH:-/admin}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
       ADMIN_MAX_UPLOAD_MB: ${ADMIN_MAX_UPLOAD_MB:-50}
+      # Time zone deciding where a "day" starts in the statistics.
+      STATS_TIMEZONE: ${STATS_TIMEZONE:-Europe/Paris}
     secrets:
       - admin_password
     labels:
@@ -59,6 +61,8 @@ services:
       # Files served as-is at the site root, e.g. thumbnail.jpg ->
       # https://photo.laurentml.fr/thumbnail.jpg (SITE_THUMBNAIL above).
       - ${PUBLIC_DIR:-./data/public}:/app/data/public
+      # Visit/download statistics written by the app (admin Stats tab).
+      - ${STATS_DIR:-./data/stats}:/app/data/stats
 
 secrets:
   # Admin mode password, kept out of .env and out of `docker inspect`.
