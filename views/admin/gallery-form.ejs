@@ -91,7 +91,7 @@
 <section class="admin-card" id="photos">
   <h2>Photos <span class="admin-sub">(<%= photos.length %>)</span></h2>
 
-  <form method="POST" enctype="multipart/form-data" action="<%= galleryUrl(gallery.id, '/photos') %>?_csrf=<%= encodeURIComponent(csrfToken) %>" class="admin-upload" id="upload-form">
+  <form method="POST" enctype="multipart/form-data" action="<%= galleryUrl(gallery.id, '/photos') %>?_csrf=<%= encodeURIComponent(csrfToken) %>" class="admin-upload" id="upload-form" data-done-url="<%= galleryUrl(gallery.id) %>?notice=uploaded#photos">
     <label for="f-photos" class="admin-dropzone">
       <strong>Add photos</strong>
       <span>Choose files, or drop them here.</span>
@@ -103,6 +103,7 @@
       <button type="submit" class="button">Upload</button>
     </div>
     <progress class="admin-progress" max="100" value="0" hidden></progress>
+    <ul class="admin-upload-errors" role="alert" hidden></ul>
   </form>
 
   <% if (photos.length) { %>

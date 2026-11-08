@@ -81,6 +81,7 @@ ul.admin-flash { padding-left: 2rem; }
 .admin-upload-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 0.75rem; }
 .admin-upload-info { color: var(--color-muted); font-size: 0.9rem; }
 .admin-progress { width: 100%; margin-top: 0.5rem; }
+.admin-upload-errors { margin: 0.75rem 0 0; padding: 0.7rem 1rem 0.7rem 2rem; border-radius: 4px; background: #fbeaea; color: #8c1d18; font-size: 0.9rem; }
 
 /* Photo grid */
 .admin-photo-toolbar { display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0 0.75rem; }

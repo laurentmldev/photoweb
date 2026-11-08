@@ -237,9 +237,12 @@ added). Photos are shown in file-name order.
 
 With Docker, the `galleries/`, `photos/` and `content/` volumes must be
 writable by `PUID`/`PGID` (the entrypoint already `chown`s them).
-If the site sits behind nginx, raise its upload limit for the admin path,
-e.g. `client_max_body_size 500m;` (nginx-proxy: a `vhost.d/<VIRTUAL_HOST>`
-file with that line), or larger photo batches will be refused with a 413.
+The admin page uploads photos **one per request**, so a reverse proxy in
+front of the site only needs to accept one photo at a time. nginx's default
+limit is 1 MB, which refuses almost any real photo (the admin then shows
+"refused by the web server as too large"): set `client_max_body_size` a bit
+above `ADMIN_MAX_UPLOAD_MB`, e.g. `client_max_body_size 60m;` (nginx-proxy:
+in the `vhost.d/<VIRTUAL_HOST>` file).
 
 ## Public files (site thumbnail)
 
