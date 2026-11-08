@@ -33,11 +33,14 @@ services:
       CAPTCHA_POW_BITS: ${CAPTCHA_POW_BITS:-18}
       # Optional: pin the signing secret of private-gallery access cookies.
       GALLERY_ACCESS_SECRET: ${GALLERY_ACCESS_SECRET:-}
-      # Admin mode (off unless ADMIN_PASSWORD is set) - see .env.example.
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      # Admin mode - see .env.example. The password comes from the
+      # admin_password secret below, mounted at /run/secrets/admin_password.
+      ADMIN_PASSWORD_FILE: /run/secrets/admin_password
       ADMIN_PATH: ${ADMIN_PATH:-/admin}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
       ADMIN_MAX_UPLOAD_MB: ${ADMIN_MAX_UPLOAD_MB:-50}
+    secrets:
+      - admin_password
     labels:
       gallery.title: "${SITE_TITLE}"
       gallery.description: "${SITE_DESCRIPTION}"
@@ -56,6 +59,15 @@ services:
       # Files served as-is at the site root, e.g. thumbnail.jpg ->
       # https://photo.laurentml.fr/thumbnail.jpg (SITE_THUMBNAIL above).
       - ${PUBLIC_DIR:-./data/public}:/app/data/public
+
+secrets:
+  # Admin mode password, kept out of .env and out of `docker inspect`.
+  # Create the file before `docker compose up` (compose refuses to start
+  # without it); leave it empty to keep admin mode off:
+  #   mkdir -p secrets && printf '%s' 'your-password' > secrets/admin_password
+  #   chmod 600 secrets/admin_password   # owned by the PUID user
+  admin_password:
+    file: ${ADMIN_PASSWORD_SECRET:-./secrets/admin_password}
 
 networks:
   # Shared with the reverse-proxy stack. Created once, outside of

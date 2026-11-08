@@ -4,6 +4,8 @@ npm-debug.log*
 
 # Local secrets & per-host settings (copy .env.example to .env)
 .env
+# Docker secrets (admin password, ...)
+/secrets/
 
 # Live site data (./data/*, also the default docker-compose volumes).
 # This is the deployed copy of sample/ that gets edited on the server,

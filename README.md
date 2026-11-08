@@ -190,8 +190,24 @@ signed in to that gallery.
 A back-office where the photographer creates and manages galleries from a
 browser, instead of editing YAML and copying files by hand.
 
-- **Off by default.** Set `ADMIN_PASSWORD` (at least 10 characters) in `.env`
-  to turn it on. While it's off, the admin URL is an ordinary 404.
+- **Off by default.** It turns on when an admin password (at least 10
+  characters) is configured; while it's off, the admin URL is an ordinary 404.
+  With Docker Compose the password is a **Docker secret**: a file on the host,
+  `./secrets/admin_password` by default (`ADMIN_PASSWORD_SECRET` in `.env` to
+  move it), mounted read-only at `/run/secrets/admin_password` and read once
+  at start-up through `ADMIN_PASSWORD_FILE`. It never appears in `.env`, the
+  environment or `docker inspect`:
+
+  ```bash
+  mkdir -p secrets
+  printf '%s' 'your-long-password' > secrets/admin_password   # no trailing newline needed either way
+  chmod 600 secrets/admin_password      # owned by the PUID user, who runs the app
+  docker compose up -d                  # restart after changing the password
+  ```
+
+  Compose won't start if that file is missing; leave it empty to keep admin
+  mode off. Without Docker, set `ADMIN_PASSWORD_FILE=/path/to/file` (or
+  `ADMIN_PASSWORD=...`) before `npm start`.
 - **No links anywhere.** Nothing on the public site points to it: the
   photographer types the URL, `/admin` by default. Set `ADMIN_PATH` (e.g.
   `/atelier-7k2`) to use a less guessable address. Admin pages send
@@ -199,7 +215,7 @@ browser, instead of editing YAML and copying files by hand.
 - **Sign-in = password + human check** (the same distorted-image question
   and proof-of-work as the contact page). 5 failed attempts per IP lock
   that IP out for 15 minutes. The session is a signed cookie (4 hours,
-  `SameSite=Strict`, limited to `ADMIN_PATH`); changing `ADMIN_PASSWORD`
+  `SameSite=Strict`, limited to `ADMIN_PATH`); changing the password
   signs every session out. Every form also carries a CSRF token.
 
 What it does:

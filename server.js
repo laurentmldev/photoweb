@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------
-// Admin mode (lib/admin-routes.js): only when ADMIN_PASSWORD is set, at
+// Admin mode (lib/admin-routes.js): only when an admin password is set, at
 // ADMIN_PATH (default /admin). Deliberately not linked from anywhere on
 // the site - the photographer types the URL. When disabled, the path is
 // just an unknown page (404).
